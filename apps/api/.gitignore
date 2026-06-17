@@ -1,0 +1,8 @@
+# Ignore env and build artifacts for API
+.env
+node_modules/
+dist/
+coverage/
+# Local editor files
+.vscode/
+.DS_Store
