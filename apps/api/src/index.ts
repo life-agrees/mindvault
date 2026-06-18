@@ -11,23 +11,23 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 
 app.use(helmet());
-// Allow local web dev servers (vite may pick 5174 or 5175) and optionally an
-// env-configured origin via `WEB_ORIGIN`.
 const allowedOrigins = [
-  process.env.WEB_ORIGIN || '',
   'http://localhost:5174',
   'http://localhost:5175',
+  process.env.FRONTEND_URL,
+  process.env.WEB_ORIGIN,
 ].filter(Boolean);
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error('CORS not allowed'), false);
-    },
-    credentials: true,
-  })
-);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/auth', authRouter);

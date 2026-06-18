@@ -52,7 +52,7 @@ export function buildMemorySummary(memories: StoredMemory[]): string {
   return lines.join('\n');
 }
 
-export async function loadUserMemories(userId: string): Promise<StoredMemory[]> {
+export async function loadUserMemories(userId: string, encryptionKey?: string): Promise<StoredMemory[]> {
   const { data: memoryIndex, error } = await supabase
     .from('mv_memories')
     .select('*')
@@ -70,21 +70,22 @@ export async function loadUserMemories(userId: string): Promise<StoredMemory[]> 
     (memoryIndex as any[]).map(async (idx) => {
       const root = idx.root_hash;
       console.log('Attempting to load memory from root_hash:', root);
-      const mem = await loadMemory(root);
+      const mem = await loadMemory(root, encryptionKey);
       if (!mem) console.error('Failed to load memory for root_hash:', root);
       return mem;
     })
   );
 
-  return memories.filter((m): m is StoredMemory => m !== null);
+  return memories.filter((m): m is StoredMemory => m !== null && !(m as any).isEncrypted);
 }
 
 export async function saveSession(params: {
   userId: string;
   messages: Message[];
   summary: string;
+  encryptionKey?: string;
 }): Promise<string | null> {
-  const { userId, messages, summary } = params;
+  const { userId, messages, summary, encryptionKey } = params;
   const sessionId = uuid();
 
   const memory: StoredMemory = {
@@ -96,13 +97,23 @@ export async function saveSession(params: {
     version: '1.0',
   };
 
-  const rootHash = await storeMemory(memory);
+  const rootHash = await storeMemory(memory, encryptionKey);
   if (!rootHash) return null;
+
+  let dbTitle = generateTitle(messages);
+  if (encryptionKey) {
+    try {
+      const { encryptAES } = await import('../lib/crypto');
+      dbTitle = encryptAES(dbTitle, encryptionKey);
+    } catch (encErr) {
+      console.error('Failed to encrypt database title:', encErr);
+    }
+  }
 
   const { data: insertData, error: insertError } = await supabase.from('mv_memories').insert({
     user_id: userId,
     session_id: sessionId,
-    title: generateTitle(messages),
+    title: dbTitle,
     root_hash: rootHash,
     message_count: messages.length,
   });

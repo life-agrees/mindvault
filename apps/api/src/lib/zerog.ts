@@ -8,6 +8,7 @@ const RPC = process.env.ZERO_G_RPC!;
 const STORAGE_RPC = process.env.ZERO_G_STORAGE_RPC!;
 const COMPUTE_ENDPOINT = process.env.ZERO_G_COMPUTE_ENDPOINT!;
 const PRIVATE_KEY = process.env.ZERO_G_PRIVATE_KEY!;
+const API_KEY = process.env.ZERO_G_API_KEY || PRIVATE_KEY;
 
 function getSigner() {
   const provider = new ethers.JsonRpcProvider(RPC);
@@ -40,10 +41,14 @@ export type Message = { role: 'user' | 'assistant' | 'system'; content: string }
 
 export async function computeChat(messages: Message[], systemPrompt: string): Promise<string> {
   try {
+    const baseUrl = COMPUTE_ENDPOINT.endsWith('/v1')
+      ? COMPUTE_ENDPOINT
+      : `${COMPUTE_ENDPOINT}/v1`;
+
     const response = await axios.post(
-      `${COMPUTE_ENDPOINT}/v1/chat/completions`,
+      `${baseUrl}/chat/completions`,
       {
-        model: 'meta-llama/Llama-3.3-70B-Instruct',
+        model: 'deepseek-v4-pro',
         max_tokens: 1000,
         temperature: 0.7,
         messages: [{ role: 'system', content: systemPrompt }, ...messages],
@@ -51,7 +56,7 @@ export async function computeChat(messages: Message[], systemPrompt: string): Pr
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${PRIVATE_KEY}`,
+          Authorization: `Bearer ${API_KEY}`,
         },
         timeout: 30000,
       }
@@ -70,7 +75,7 @@ export async function computeChat(messages: Message[], systemPrompt: string): Pr
 
 async function fallbackChat(messages: Message[], systemPrompt: string): Promise<string> {
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
-  const GROQ_API_URL = process.env.GROQ_API_URL || 'https://api.groq.ai/v1';
+  const GROQ_API_URL = process.env.GROQ_API_URL || 'https://api.groq.com/openai/v1';
 
   const localEchoFallback = async () => {
     const last = messages[messages.length - 1]?.content ?? '';
@@ -81,7 +86,7 @@ async function fallbackChat(messages: Message[], systemPrompt: string): Promise<
 
   try {
     const payload = {
-      model: 'groq-1',
+      model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       max_tokens: 1000,
       temperature: 0.7,
@@ -92,8 +97,7 @@ async function fallbackChat(messages: Message[], systemPrompt: string): Promise<
       timeout: 30000,
     });
 
-    const text =
-      res.data?.choices?.[0]?.message?.content || res.data?.choices?.[0]?.text || res.data?.output?.[0]?.content || res.data?.text;
+    const text = res.data?.choices?.[0]?.message?.content;
 
     if (!text) return await localEchoFallback();
     return text;
@@ -112,10 +116,16 @@ export type StoredMemory = {
   version: string;
 };
 
-export async function storeMemory(memory: StoredMemory): Promise<string | null> {
+export async function storeMemory(memory: StoredMemory, encryptionKey?: string): Promise<string | null> {
   try {
     const signer = getSigner();
-    const content = JSON.stringify({ ...memory, storedAt: Date.now(), app: 'mindvault' });
+    let content = JSON.stringify({ ...memory, storedAt: Date.now(), app: 'mindvault' });
+    
+    if (encryptionKey) {
+      const { encryptAES } = await import('./crypto');
+      content = encryptAES(content, encryptionKey);
+    }
+    
     const buffer = Buffer.from(content, 'utf-8');
 
     const tmpName = `mindvault-memory-${Date.now()}-${Math.random().toString(36).slice(2)}.json`;
@@ -189,19 +199,40 @@ export async function storeMemory(memory: StoredMemory): Promise<string | null> 
   }
 }
 
-export async function loadMemory(rootHash: string): Promise<StoredMemory | null> {
+export async function loadMemory(rootHash: string, encryptionKey?: string): Promise<StoredMemory | null> {
+  const tmpName = `mindvault-download-${rootHash}-${Date.now()}.json`;
+  const tmpPath = path.join(os.tmpdir(), tmpName);
   try {
-    const signer = getSigner();
     const sdk = await getStorageSdk();
     const IndexerLocal = sdk.Indexer ?? sdk.default?.Indexer ?? sdk.Indexer;
     const indexer = new IndexerLocal(STORAGE_RPC);
-    const [data, err] = await indexer.download(rootHash, undefined, signer);
+    const downloadErr = await indexer.download(rootHash, tmpPath, false);
 
-    if (err || !data) return null;
-    const content = Buffer.from(data).toString('utf-8');
+    if (downloadErr) {
+      console.error('loadMemory 0G download error:', downloadErr);
+      try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
+      return null;
+    }
+
+    const data = await fs.readFile(tmpPath);
+    let content = data.toString('utf-8');
+    try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
+    
+    if (!content.trim().startsWith('{')) {
+      // Content is encrypted
+      if (encryptionKey) {
+        const { decryptAES } = await import('./crypto');
+        content = decryptAES(content, encryptionKey);
+        return JSON.parse(content) as StoredMemory;
+      } else {
+        return { isEncrypted: true, ciphertext: content } as any;
+      }
+    }
+    
     return JSON.parse(content) as StoredMemory;
   } catch (err) {
     console.error('loadMemory error:', err && err.stack ? err.stack : err);
+    try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
     return null;
   }
 }

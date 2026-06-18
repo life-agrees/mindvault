@@ -31,7 +31,7 @@ function request(method, path, body = null, headers = {}) {
 (async function run() {
   try {
     console.log('Step 1 — login');
-    let login = await request('POST', '/auth/login', { privyDid: 'did:privy:test123', email: 'prince@test.com' });
+    let login = await request('POST', '/auth/login', { privyToken: 'did:privy:test123', email: 'prince@test.com' });
     let token = login.data?.token;
     if (!token) {
       console.warn('Login failed, attempting dev-token fallback');

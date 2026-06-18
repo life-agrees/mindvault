@@ -1,17 +1,36 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
 import { signToken } from '../lib/jwt';
+import { PrivyClient } from '@privy-io/server-auth';
 
 const router = Router();
 
-router.post('/login', async (req: Request, res: Response) => {
-  const { privyDid, email } = req.body;
+// Singleton — reuses cached verification key across requests
+const privyClient = new PrivyClient(
+  process.env.PRIVY_APP_ID!,
+  process.env.PRIVY_APP_SECRET!,
+  { timeout: 15000 }
+);
 
-  if (!privyDid) {
-    return res.status(400).json({ error: 'privyDid is required' });
+router.post('/login', async (req: Request, res: Response) => {
+  const { privyToken, email } = req.body;
+
+  if (!privyToken) {
+    return res.status(400).json({ error: 'privyToken is required' });
   }
 
   try {
+    let privyDid: string;
+
+    // Support dev bypass for E2E testing
+    if (process.env.DEV_AUTH === 'true' && privyToken.startsWith('did:privy:')) {
+      privyDid = privyToken;
+    } else {
+      const claims = await privyClient.verifyAuthToken(privyToken);
+
+      privyDid = claims.userId;
+    }
+
     let { data: user } = await supabase
       .from('mv_users')
       .select('*')

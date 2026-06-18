@@ -44,6 +44,7 @@ router.post(
   chatLimit,
   async (req: AuthRequest, res: Response) => {
     const { message, sessionMessages = [] } = req.body;
+    const encryptionKey = req.headers['x-encryption-key'] as string | undefined;
 
     if (!message?.trim()) {
       return res.status(400).json({ error: 'Message is required' });
@@ -52,7 +53,7 @@ router.post(
     const userId = req.user!.userId;
 
     try {
-      const memories = await loadUserMemories(userId);
+      const memories = await loadUserMemories(userId, encryptionKey);
       const memorySummary = buildMemorySummary(memories);
 
       const systemWithMemory = memorySummary
@@ -71,13 +72,20 @@ router.post(
       });
     } catch (err: any) {
       console.error('Chat error:', err);
-      res.status(500).json({ error: 'Failed to get response' });
+
+      // Both 0G Compute and fallback failed — be honest about it
+      res.status(503).json({
+        error: 'AI services are temporarily unavailable. Please try again shortly.',
+        response: "I'm having trouble connecting right now — both my primary " +
+          "and backup networks seem busy. Give me a moment and try again.",
+      });
     }
   }
 );
 
 router.post('/save', authenticate, async (req: AuthRequest, res: Response) => {
   const { messages } = req.body;
+  const encryptionKey = req.headers['x-encryption-key'] as string | undefined;
 
   if (!messages || messages.length < 2) {
     return res.status(400).json({ error: 'Need at least one exchange to save' });
@@ -87,7 +95,7 @@ router.post('/save', authenticate, async (req: AuthRequest, res: Response) => {
 
   try {
     const summary = await summarizeSession(messages);
-    const rootHash = await saveSession({ userId, messages, summary });
+    const rootHash = await saveSession({ userId, messages, summary, encryptionKey });
 
     if (!rootHash) {
       return res.status(500).json({ error: 'Failed to store memory on 0G Storage' });
@@ -120,21 +128,35 @@ router.get('/memories', authenticate, async (req: AuthRequest, res: Response) =>
 
 router.get('/memory/:hash', authenticate, async (req: AuthRequest, res: Response) => {
   const { hash } = req.params;
+  const encryptionKey = req.headers['x-encryption-key'] as string | undefined;
 
   try {
+    // 1. Verify database index ownership first
+    const { data: dbMemory, error: dbErr } = await supabase
+      .from('mv_memories')
+      .select('user_id')
+      .eq('root_hash', hash)
+      .single();
+
+    if (dbErr || !dbMemory) {
+      return res.status(404).json({ error: 'Memory not indexed or access denied' });
+    }
+
+    if (dbMemory.user_id !== req.user!.userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // 2. Fetch from 0G Storage
     const { loadMemory } = await import('../lib/zerog');
-    const memory = await loadMemory(hash);
+    const memory = await loadMemory(hash, encryptionKey);
 
     if (!memory) {
       return res.status(404).json({ error: 'Memory not found on 0G Storage' });
     }
 
-    if (memory.userId !== req.user!.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
     res.json({ memory, hash });
   } catch (err) {
+    console.error('Retrieve memory error:', err);
     res.status(500).json({ error: 'Failed to retrieve memory' });
   }
 });
