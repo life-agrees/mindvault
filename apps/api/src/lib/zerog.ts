@@ -15,6 +15,7 @@ const STORAGE_RPC = process.env.ZERO_G_STORAGE_RPC!;
 const COMPUTE_ENDPOINT = process.env.ZERO_G_COMPUTE_ENDPOINT!;
 const PRIVATE_KEY = process.env.ZERO_G_PRIVATE_KEY!;
 const API_KEY = process.env.ZERO_G_API_KEY || PRIVATE_KEY;
+const ZERO_G_MODEL = process.env.ZERO_G_MODEL || 'deepseek-v4-pro';
 
 function getSigner() {
   const provider = new ethers.JsonRpcProvider(RPC);
@@ -60,7 +61,7 @@ export async function computeChat(messages: Message[], systemPrompt: string): Pr
     const response = await axios.post(
       finalUrl,
       {
-        model: 'deepseek-v4-pro',
+        model: ZERO_G_MODEL,
         max_tokens: 1000,
         temperature: 0.7,
         messages: [{ role: 'system', content: systemPrompt }, ...messages],
