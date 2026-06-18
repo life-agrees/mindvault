@@ -1,5 +1,6 @@
 # Ignore env and build artifacts for Web app
 .env
+.env.production
 node_modules/
 dist/
 .build/

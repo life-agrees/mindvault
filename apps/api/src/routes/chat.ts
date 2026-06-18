@@ -127,7 +127,7 @@ router.get('/memories', authenticate, async (req: AuthRequest, res: Response) =>
 });
 
 router.get('/memory/:hash', authenticate, async (req: AuthRequest, res: Response) => {
-  const { hash } = req.params;
+  const hash = Array.isArray(req.params.hash) ? req.params.hash[0] : req.params.hash;
   const encryptionKey = req.headers['x-encryption-key'] as string | undefined;
 
   try {

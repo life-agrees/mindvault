@@ -4,6 +4,12 @@ import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
 
+/** Safe error serialiser — works for unknown catch variables */
+function errStr(e: unknown): string {
+  if (e instanceof Error) return e.stack ?? e.message;
+  return String(e);
+}
+
 const RPC = process.env.ZERO_G_RPC!;
 const STORAGE_RPC = process.env.ZERO_G_STORAGE_RPC!;
 const COMPUTE_ENDPOINT = process.env.ZERO_G_COMPUTE_ENDPOINT!;
@@ -143,7 +149,7 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
       else if (typeof ZgFileLocal.fromBytes === 'function') file = await ZgFileLocal.fromBytes(buffer, 'application/json');
       else throw new Error('No compatible ZgFile factory found in installed SDK');
     } catch (zErr) {
-      console.error('0G ZgFile creation error:', zErr && zErr.stack ? zErr.stack : zErr);
+      console.error('0G ZgFile creation error:', errStr(zErr));
       try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
       return null;
     }
@@ -156,7 +162,7 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
         if (!tree) throw maybeTree[1] ?? new Error('Empty merkle tree');
       } else tree = maybeTree;
     } catch (treeErr) {
-      console.error('0G merkleTree error:', treeErr && treeErr.stack ? treeErr.stack : treeErr);
+      console.error('0G merkleTree error:', errStr(treeErr));
       try { await file.close?.(); } catch {}
       try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
       return null;
@@ -164,7 +170,7 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
 
     let rootHash: string | undefined;
     try { rootHash = typeof tree.rootHash === 'function' ? tree.rootHash() : tree.root_hash ?? tree.rootHash; } catch (rhErr) {
-      console.error('Failed to read rootHash from merkle tree:', rhErr && rhErr.stack ? rhErr.stack : rhErr);
+      console.error('Failed to read rootHash from merkle tree:', errStr(rhErr));
       return null;
     }
 
@@ -183,7 +189,7 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
         }
       }
     } catch (uploadErr) {
-      console.error('0G upload exception:', uploadErr && uploadErr.stack ? uploadErr.stack : uploadErr);
+      console.error('0G upload exception:', errStr(uploadErr));
       try { await file.close?.(); } catch {}
       try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
       return null;
@@ -194,7 +200,7 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
     console.log('✅ Memory stored on 0G Storage:', rootHash);
     return rootHash ?? null;
   } catch (err) {
-    console.warn('0G storage failed:', err && err.stack ? err.stack : err);
+    console.warn('0G storage failed:', errStr(err));
     return null;
   }
 }
@@ -231,7 +237,7 @@ export async function loadMemory(rootHash: string, encryptionKey?: string): Prom
     
     return JSON.parse(content) as StoredMemory;
   } catch (err) {
-    console.error('loadMemory error:', err && err.stack ? err.stack : err);
+    console.error('loadMemory error:', errStr(err));
     try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
     return null;
   }
