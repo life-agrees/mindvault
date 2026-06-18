@@ -48,12 +48,17 @@ export type Message = { role: 'user' | 'assistant' | 'system'; content: string }
 
 export async function computeChat(messages: Message[], systemPrompt: string): Promise<string> {
   try {
-    const baseUrl = COMPUTE_ENDPOINT.endsWith('/v1')
-      ? COMPUTE_ENDPOINT
-      : `${COMPUTE_ENDPOINT}/v1`;
+    let cleanUrl = COMPUTE_ENDPOINT.trim().replace(/\/+$/, '');
+    if (cleanUrl.endsWith('/chat/completions')) {
+      cleanUrl = cleanUrl.slice(0, -'/chat/completions'.length);
+    }
+    if (!cleanUrl.endsWith('/v1')) {
+      cleanUrl = `${cleanUrl}/v1`;
+    }
+    const finalUrl = `${cleanUrl}/chat/completions`;
 
     const response = await axios.post(
-      `${baseUrl}/chat/completions`,
+      finalUrl,
       {
         model: 'deepseek-v4-pro',
         max_tokens: 1000,
