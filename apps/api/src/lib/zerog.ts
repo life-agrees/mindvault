@@ -43,6 +43,7 @@ async function getStorageSdk(): Promise<any> {
   throw new Error('No 0G storage SDK installed. Install @0gfoundation/0g-storage-ts-sdk or @0glabs/0g-ts-sdk');
 }
 
+// Represent a message object in the 0G Compute chat payload
 export type Message = { role: 'user' | 'assistant' | 'system'; content: string };
 
 export async function computeChat(messages: Message[], systemPrompt: string): Promise<string> {
