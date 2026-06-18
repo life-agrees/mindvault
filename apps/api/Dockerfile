@@ -1,5 +1,6 @@
 # ── Stage 1: builder ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# Node 22+ required — @supabase/realtime-js v2.x needs native WebSocket support
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +21,7 @@ WORKDIR /app/apps/api
 RUN pnpm run build
 
 # ── Stage 2: runner ───────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 

@@ -48,5 +48,12 @@ export const supabase = createClient(
       autoRefreshToken: false,
       persistSession: false,
     },
+    // This is a server-side service-role client — Realtime is never used here.
+    // Disabling it avoids the WebSocket startup error on Node < 22.
+    realtime: {
+      timeout: 0,
+      heartbeatIntervalMs: 0,
+      reconnectAfterMs: () => 999999999,
+    } as any,
   }
 );
