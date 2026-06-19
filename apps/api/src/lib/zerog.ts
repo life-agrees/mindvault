@@ -49,19 +49,17 @@ export type Message = { role: 'user' | 'assistant' | 'system'; content: string }
 
 export async function computeChat(messages: Message[], systemPrompt: string): Promise<string> {
   try {
-    let cleanUrl = COMPUTE_ENDPOINT.trim().replace(/\/+$/, '');
-    if (cleanUrl.endsWith('/chat/completions')) {
-      cleanUrl = cleanUrl.slice(0, -'/chat/completions'.length);
-    }
-    // If the configured endpoint contains a provider proxy path (e.g. 
-    // "/v1/proxy"), do not append an extra /v1 segment — the proxy URL
-    // already includes the provider routing. Otherwise, ensure the base
-    // endpoint ends with /v1 (the router-style endpoints expect this).
-    const isProviderProxy = cleanUrl.includes('/proxy');
-    if (!isProviderProxy && !cleanUrl.endsWith('/v1')) {
-      cleanUrl = `${cleanUrl}/v1`;
-    }
-    const finalUrl = `${cleanUrl}/chat/completions`;
+    // Strip trailing slashes then strip any trailing /chat/completions
+    // so that COMPUTE_ENDPOINT can be set to either:
+    //   https://router-api.0g.ai/v1
+    //   https://compute-network-6.integratenetwork.work/v1/proxy
+    // and both work correctly.
+    const base = COMPUTE_ENDPOINT
+      .trim()
+      .replace(/\/+$/, '')
+      .replace(/\/chat\/completions$/, '');
+    const finalUrl = `${base}/chat/completions`;
+    console.log('🔌 0G Compute request:', finalUrl, '| model:', ZERO_G_MODEL, '| key prefix:', API_KEY?.slice(0, 12));
 
     const response = await axios.post(
       finalUrl,
