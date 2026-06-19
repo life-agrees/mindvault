@@ -61,3 +61,61 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
+
+/* ── Markdown prose inside AI bubbles ─────────────────── */
+.prose-mindvault { color: #3d3028; font-size: 0.875rem; line-height: 1.6; }
+.prose-mindvault p { margin-bottom: 0.5em; }
+.prose-mindvault p:last-child { margin-bottom: 0; }
+.prose-mindvault strong { font-weight: 600; color: #1c1914; }
+.prose-mindvault em { font-style: italic; }
+.prose-mindvault ul { list-style: disc; padding-left: 1.25em; margin: 0.4em 0; }
+.prose-mindvault ol { list-style: decimal; padding-left: 1.25em; margin: 0.4em 0; }
+.prose-mindvault li { margin-bottom: 0.25em; }
+.prose-mindvault h1, .prose-mindvault h2, .prose-mindvault h3 {
+  font-weight: 600; color: #1c1914; margin: 0.6em 0 0.3em;
+}
+.prose-mindvault h1 { font-size: 1.1em; }
+.prose-mindvault h2 { font-size: 1em; }
+.prose-mindvault h3 { font-size: 0.95em; }
+.prose-mindvault code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  background: rgba(120,95,68,0.10);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  color: #6b5a49;
+}
+.prose-mindvault pre {
+  background: rgba(120,95,68,0.08);
+  border: 1px solid rgba(120,95,68,0.15);
+  border-radius: 10px;
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.prose-mindvault pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.82em;
+}
+.prose-mindvault blockquote {
+  border-left: 3px solid rgba(99,102,241,0.35);
+  padding-left: 0.75em;
+  color: #6b5a49;
+  font-style: italic;
+  margin: 0.4em 0;
+}
+.prose-mindvault a { color: #6366f1; text-decoration: underline; }
+.prose-mindvault hr { border: none; border-top: 1px solid rgba(120,95,68,0.15); margin: 0.6em 0; }
+
+/* ── Toast slide-up animation ─────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+.toast-enter { animation: toastIn 0.3s ease-out forwards; }
+.toast-exit  { animation: toastOut 0.25s ease-in forwards; }

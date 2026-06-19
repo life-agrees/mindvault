@@ -64,8 +64,11 @@ export default function Onboarding() {
                      transition-all duration-150 active:scale-[0.98]"
           style={{ background: '#6366f1', boxShadow: '0 4px 20px rgba(99,102,241,0.25)' }}
         >
-          Get started — it's free
+          Start your memory vault →
         </button>
+        <p className="text-center text-xs leading-relaxed" style={{ color: '#a8927f' }}>
+          No account needed. Your data lives on a blockchain you control.
+        </p>
         <PoweredByBadge />
       </div>
     </div>

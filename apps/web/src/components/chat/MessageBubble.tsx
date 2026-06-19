@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown';
 import { type ChatMessage } from '../../hooks/useChat';
 
 type Props = {
@@ -6,12 +7,20 @@ type Props = {
   onRetry?: () => void;
 };
 
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+
 export function MessageBubble({ message, isError, onRetry }: Props) {
   const isUser = message.role === 'user';
 
   return (
     <div className={`flex message-enter ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className="flex flex-col gap-1.5 max-w-[85%]">
+      <div className="flex flex-col gap-1 max-w-[85%]">
         <div className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse self-end' : ''}`}>
 
           {/* AI avatar */}
@@ -50,14 +59,35 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
                   }
             }
           >
-            <p className="whitespace-pre-wrap break-words">{message.content}</p>
+            {isUser || isError ? (
+              <p className="whitespace-pre-wrap break-words">{message.content}</p>
+            ) : (
+              /* Render AI response as markdown */
+              <div className="prose-mindvault">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+            )}
           </div>
         </div>
 
+        {/* Timestamp row */}
+        <div className={`flex items-center gap-2 px-1 ${isUser ? 'justify-end' : 'justify-start ml-9'}`}>
+          <span className="text-[10px]" style={{ color: '#c8b4a0' }}>
+            {message.timestamp ? formatTime(message.timestamp) : ''}
+          </span>
+          {!isUser && !isError && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded"
+                  style={{ color: '#6366f1', background: 'rgba(99,102,241,0.07)' }}>
+              via 0G
+            </span>
+          )}
+        </div>
+
+        {/* Retry button */}
         {isError && onRetry && (
           <button
             onClick={onRetry}
-            className="text-xs transition-colors ml-9 self-start mt-0.5 font-medium"
+            className="text-xs transition-colors ml-9 self-start font-medium"
             style={{ color: '#6366f1' }}
             onMouseEnter={e => e.currentTarget.style.color = '#4f52d4'}
             onMouseLeave={e => e.currentTarget.style.color = '#6366f1'}

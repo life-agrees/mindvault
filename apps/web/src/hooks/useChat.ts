@@ -5,6 +5,7 @@ export type ChatMessage = {
   role: 'user' | 'assistant';
   content: string;
   id: string;
+  timestamp: number;   // unix ms
   isError?: boolean;
 };
 
@@ -15,6 +16,8 @@ export type ChatState = {
   memoryLoaded: boolean;
   sessionCount: number;
   lastSaveHash: string | null;
+  toastMessage: string | null;
+  clearToast: () => void;
   sendMessage: (text: string) => Promise<void>;
   retryMessage: () => Promise<void>;
   saveSession: () => Promise<void>;
@@ -42,7 +45,10 @@ export function useChat(): ChatState {
   const [memoryLoaded, setMemoryLoaded] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [lastSaveHash, setLastSaveHash] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const dirtyRef = useRef(false);
+
+  const clearToast = useCallback(() => setToastMessage(null), []);
 
   // Persist to sessionStorage on every message change
   useEffect(() => {
@@ -56,7 +62,7 @@ export function useChat(): ChatState {
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
 
-    const userMsg: ChatMessage = { role: 'user', content: text, id: genId() };
+    const userMsg: ChatMessage = { role: 'user', content: text, id: genId(), timestamp: Date.now() };
     setMessages((prev) => [...prev, userMsg]);
     setIsThinking(true);
     dirtyRef.current = true;
@@ -72,6 +78,7 @@ export function useChat(): ChatState {
         role: 'assistant',
         content: data.response,
         id: genId(),
+        timestamp: Date.now(),
       };
 
       setMessages((prev) => [...prev, aiMsg]);
@@ -94,7 +101,7 @@ export function useChat(): ChatState {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: errorContent, id: genId(), isError: true },
+        { role: 'assistant', content: errorContent, id: genId(), timestamp: Date.now(), isError: true },
       ]);
 
       if (isNetworkError) dirtyRef.current = false;
@@ -139,6 +146,7 @@ export function useChat(): ChatState {
       if (data.saved) {
         setLastSaveHash(data.rootHash);
         dirtyRef.current = false;
+        setToastMessage('✓ Memory stored on 0G — yours forever');
       }
     } catch (err) {
       console.error('Save session failed:', err);
@@ -163,6 +171,8 @@ export function useChat(): ChatState {
     memoryLoaded,
     sessionCount,
     lastSaveHash,
+    toastMessage,
+    clearToast,
     sendMessage,
     retryMessage,
     saveSession,

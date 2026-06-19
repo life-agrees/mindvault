@@ -14,6 +14,8 @@ export default function Chat() {
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastExiting, setToastExiting] = useState(false);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -39,6 +41,18 @@ export default function Chat() {
     window.visualViewport?.addEventListener('resize', handleResize);
     return () => window.visualViewport?.removeEventListener('resize', handleResize);
   }, []);
+
+  // Auto-show and then dismiss the memory-saved toast
+  useEffect(() => {
+    if (!chat.toastMessage) { setToastVisible(false); return; }
+    setToastExiting(false);
+    setToastVisible(true);
+    const hideTimer = setTimeout(() => {
+      setToastExiting(true);
+      setTimeout(() => { setToastVisible(false); chat.clearToast(); }, 300);
+    }, 3200);
+    return () => clearTimeout(hideTimer);
+  }, [chat.toastMessage]);
 
   function handleLogout() { localLogout(); privyLogout(); }
   function handleNewChat() { chat.saveSession(); chat.startNewSession(); }
@@ -145,9 +159,18 @@ export default function Chat() {
                    style={{ background: 'rgba(99,102,241,0.65)' }}>
                 <span className="text-white" style={{ fontSize: '6px', fontWeight: 700 }}>0G</span>
               </div>
-              <span className="text-[10px] font-mono truncate" style={{ color: '#c8b4a0' }}>
+              <a
+                href={`https://storagescan-newton.0g.ai/tx/${chat.lastSaveHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-mono truncate transition-colors"
+                style={{ color: '#c8b4a0' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
+                onMouseLeave={e => e.currentTarget.style.color = '#c8b4a0'}
+                title="View on 0G Storage Explorer"
+              >
                 {chat.lastSaveHash.slice(0, 10)}…
-              </span>
+              </a>
             </div>
           )}
 
@@ -216,7 +239,7 @@ export default function Chat() {
             )}
 
             {!isSyncing && chat.messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-24 gap-6">
+              <div className="flex flex-col items-center justify-center py-16 gap-6">
                 <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-3xl shadow-sm"
                      style={{ background: '#ede7dc', border: '1px solid rgba(120,95,68,0.15)' }}>
                   🧠
@@ -230,6 +253,39 @@ export default function Chat() {
                     on a network nobody controls.
                   </p>
                 </div>
+
+                {/* Starter prompt chips */}
+                <div className="flex flex-wrap justify-center gap-2 max-w-sm px-4">
+                  {[
+                    "What should I focus on this week?",
+                    "Help me think through a decision",
+                    "What have we talked about before?",
+                    "I need to vent about something",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => chat.sendMessage(prompt)}
+                      className="text-sm px-3.5 py-2 rounded-full transition-all duration-150 active:scale-95"
+                      style={{
+                        background: '#fefcf8',
+                        border: '1px solid rgba(120,95,68,0.18)',
+                        color: '#5c4f42',
+                        boxShadow: '0 1px 4px rgba(120,95,68,0.06)',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.background = '#f0e8d8';
+                        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(120,95,68,0.32)';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.background = '#fefcf8';
+                        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(120,95,68,0.18)';
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full"
                      style={{ background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', color: '#6366f1' }}>
                   <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#6366f1' }} />
@@ -256,12 +312,37 @@ export default function Chat() {
              style={{ background: 'rgba(245,240,232,0.95)', borderTop: '1px solid rgba(120,95,68,0.10)' }}>
           <div className="max-w-2xl mx-auto">
             <ChatInput onSend={chat.sendMessage} disabled={chat.isThinking} />
-            <p className="text-center text-[11px] mt-2.5" style={{ color: '#c8b4a0' }}>
-              🔐 End-to-end encrypted · Permanently stored on 0G Storage
-            </p>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-[11px]" style={{ color: '#c8b4a0' }}>
+                🔐 End-to-end encrypted · Stored on 0G
+              </p>
+              <p className="text-[11px] hidden sm:block" style={{ color: '#c8b4a0' }}>
+                Enter to send · Shift+Enter for new line
+              </p>
+            </div>
           </div>
         </div>
       </main>
+
+      {/* ── Memory Saved Toast ── */}
+      {toastVisible && chat.toastMessage && (
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none ${toastExiting ? 'toast-exit' : 'toast-enter'}`}
+        >
+          <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg"
+               style={{
+                 background: '#1c1914',
+                 color: '#f5f0e8',
+                 fontSize: '13px',
+                 fontWeight: 500,
+                 boxShadow: '0 8px 32px rgba(28,25,20,0.35)',
+                 whiteSpace: 'nowrap',
+               }}>
+            <span style={{ color: '#4ade80' }}>✓</span>
+            {chat.toastMessage}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
