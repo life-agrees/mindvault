@@ -53,7 +53,12 @@ export async function computeChat(messages: Message[], systemPrompt: string): Pr
     if (cleanUrl.endsWith('/chat/completions')) {
       cleanUrl = cleanUrl.slice(0, -'/chat/completions'.length);
     }
-    if (!cleanUrl.endsWith('/v1')) {
+    // If the configured endpoint contains a provider proxy path (e.g. 
+    // "/v1/proxy"), do not append an extra /v1 segment — the proxy URL
+    // already includes the provider routing. Otherwise, ensure the base
+    // endpoint ends with /v1 (the router-style endpoints expect this).
+    const isProviderProxy = cleanUrl.includes('/proxy');
+    if (!isProviderProxy && !cleanUrl.endsWith('/v1')) {
       cleanUrl = `${cleanUrl}/v1`;
     }
     const finalUrl = `${cleanUrl}/chat/completions`;
