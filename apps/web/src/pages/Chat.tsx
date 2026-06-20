@@ -126,8 +126,51 @@ export default function Chat() {
           </button>
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Recent Sessions */}
+        <div className="flex-1 overflow-y-auto px-3 py-2 flex flex-col gap-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider px-3 mb-1" style={{ color: '#a8927f' }}>
+            Recent Sessions
+          </p>
+          {chat.recentSessions.length === 0 ? (
+            <p className="text-[11px] px-3 italic" style={{ color: '#a8927f' }}>No recent sessions</p>
+          ) : (
+            <div className="flex flex-col gap-0.5">
+              {chat.recentSessions.map(session => {
+                const isActive = chat.sessionId === session.id;
+                return (
+                  <button
+                    key={session.id}
+                    onClick={() => { chat.loadSession(session); setSidebarOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all duration-150 truncate flex items-center justify-between group`}
+                    style={{
+                      color: isActive ? '#1c1914' : '#5c4f42',
+                      background: isActive ? 'rgba(120,95,68,0.08)' : 'transparent',
+                      fontWeight: isActive ? '600' : 'normal'
+                    }}
+                    onMouseEnter={e => {
+                      if (!isActive) {
+                        (e.currentTarget as HTMLElement).style.background = 'rgba(120,95,68,0.06)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isActive) {
+                        (e.currentTarget as HTMLElement).style.background = 'transparent';
+                      }
+                    }}
+                  >
+                    <span className="truncate pr-2">{session.title}</span>
+                    {session.lastSaveHash && (
+                      <span className="flex-shrink-0 text-[8px] font-bold px-1 py-0.5 rounded"
+                            style={{ background: 'rgba(99,102,241,0.15)', color: '#6366f1' }}>
+                        0G
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Memory Status */}
         <div className="px-4 py-3" style={{ borderTop: '1px solid rgba(120,95,68,0.12)' }}>
@@ -154,23 +197,38 @@ export default function Chat() {
           )}
 
           {chat.lastSaveHash && !chat.isSaving && (
-            <div className="flex items-center gap-1.5 mb-2">
-              <div className="w-3 h-3 rounded-sm flex items-center justify-center flex-shrink-0"
-                   style={{ background: 'rgba(99,102,241,0.65)' }}>
-                <span className="text-white" style={{ fontSize: '6px', fontWeight: 700 }}>0G</span>
+            <div className="flex flex-col gap-1 mb-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm flex items-center justify-center flex-shrink-0"
+                     style={{ background: 'rgba(99,102,241,0.65)' }}>
+                  <span className="text-white" style={{ fontSize: '6px', fontWeight: 700 }}>0G</span>
+                </div>
+                <a
+                  href={`https://storagescan-newton.0g.ai/tx/${chat.lastSaveHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-mono truncate transition-colors"
+                  style={{ color: '#c8b4a0' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#c8b4a0'}
+                  title="View on 0G Storage Explorer"
+                >
+                  {chat.lastSaveHash.slice(0, 10)}…
+                </a>
               </div>
-              <a
-                href={`https://storagescan-newton.0g.ai/tx/${chat.lastSaveHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-mono truncate transition-colors"
-                style={{ color: '#c8b4a0' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
-                onMouseLeave={e => e.currentTarget.style.color = '#c8b4a0'}
-                title="View on 0G Storage Explorer"
-              >
-                {chat.lastSaveHash.slice(0, 10)}…
-              </a>
+              {chat.lastSaveTx && (
+                <a
+                  href={`https://chainscan-newton.0g.ai/tx/${chat.lastSaveTx}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[9px] underline underline-offset-2 transition-colors"
+                  style={{ color: '#a8927f', paddingLeft: '18px' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#a8927f'}
+                >
+                  View on-chain →
+                </a>
+              )}
             </div>
           )}
 

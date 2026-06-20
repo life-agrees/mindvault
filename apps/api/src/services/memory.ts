@@ -84,7 +84,7 @@ export async function saveSession(params: {
   messages: Message[];
   summary: string;
   encryptionKey?: string;
-}): Promise<string | null> {
+}): Promise<{ rootHash: string; txHash: string | null } | null> {
   const { userId, messages, summary, encryptionKey } = params;
   const sessionId = uuid();
 
@@ -97,10 +97,10 @@ export async function saveSession(params: {
     version: '1.0',
   };
 
-  const rootHash = await storeMemory(memory, encryptionKey);
-  if (!rootHash) return null;
+  const result = await storeMemory(memory, encryptionKey);
+  if (!result) return null;
 
-  let dbTitle = generateTitle(messages);
+  let dbTitle = summary || generateTitle(messages);
   if (encryptionKey) {
     try {
       const { encryptAES } = await import('../lib/crypto');
@@ -114,16 +114,17 @@ export async function saveSession(params: {
     user_id: userId,
     session_id: sessionId,
     title: dbTitle,
-    root_hash: rootHash,
+    root_hash: result.rootHash,
+    tx_hash: result.txHash,
     message_count: messages.length,
   });
 
   if (insertError) {
     console.error('Supabase insert error for mv_memories:', insertError);
-    // continue returning rootHash so caller knows upload succeeded
+    // continue returning result so caller knows upload succeeded
   }
 
-  return rootHash;
+  return result;
 }
 
 export async function summarizeSession(messages: Message[]): Promise<string> {

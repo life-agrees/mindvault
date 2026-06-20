@@ -37,9 +37,16 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                    style={{ background: 'rgba(99,102,241,0.7)' }}>
                 <span className="text-white text-[7px] font-bold">0G</span>
               </div>
-              <span className="text-xs font-mono" style={{ color: '#a8927f' }}>
+              <a
+                href={`https://storagescan-newton.0g.ai/tx/${hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-mono underline hover:text-[#6366f1] transition-colors"
+                style={{ color: '#a8927f' }}
+                title="View on 0G Storage Explorer"
+              >
                 {hash.slice(0, 16)}…{hash.slice(-8)}
-              </span>
+              </a>
             </div>
           </div>
           <button onClick={onClose}
@@ -113,6 +120,31 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                       </div>
                     ))}
                   </div>
+
+                  {/* On-chain Transaction Proof */}
+                  {memory.txHash && (
+                    <div className="rounded-xl p-3.5 mt-2 flex items-center justify-between"
+                         style={{ background: 'rgba(120,95,68,0.05)', border: '1px solid rgba(120,95,68,0.10)' }}>
+                      <div className="min-w-0 flex-1 pr-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider"
+                           style={{ color: '#8a745f' }}>On-Chain Transaction</p>
+                        <p className="text-[11px] font-mono mt-0.5 truncate" style={{ color: '#a8927f' }}>
+                          {memory.txHash}
+                        </p>
+                      </div>
+                      <a
+                        href={`https://chainscan-newton.0g.ai/tx/${memory.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-colors flex-shrink-0"
+                        style={{ background: '#6366f1' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#4f52d4')}
+                        onMouseLeave={e => (e.currentTarget.style.background = '#6366f1')}
+                      >
+                        Verify Chain →
+                      </a>
+                    </div>
+                  )}
 
                   {/* Footer */}
                   <div className="text-center pt-3 pb-1 mt-2"

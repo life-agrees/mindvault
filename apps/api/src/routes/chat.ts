@@ -56,9 +56,16 @@ router.post(
       const memories = await loadUserMemories(userId, encryptionKey);
       const memorySummary = buildMemorySummary(memories);
 
+      const dateStr = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
       const systemWithMemory = memorySummary
-        ? `${SYSTEM_PROMPT}\n\n${memorySummary}`
-        : SYSTEM_PROMPT;
+        ? `${SYSTEM_PROMPT}\n\nToday's date is ${dateStr}.\n\n${memorySummary}`
+        : `${SYSTEM_PROMPT}\n\nToday's date is ${dateStr}.`;
 
       const messages: Message[] = [...sessionMessages, { role: 'user', content: message }];
 
@@ -95,13 +102,19 @@ router.post('/save', authenticate, async (req: AuthRequest, res: Response) => {
 
   try {
     const summary = await summarizeSession(messages);
-    const rootHash = await saveSession({ userId, messages, summary, encryptionKey });
+    const result = await saveSession({ userId, messages, summary, encryptionKey });
 
-    if (!rootHash) {
+    if (!result) {
       return res.status(500).json({ error: 'Failed to store memory on 0G Storage' });
     }
 
-    res.json({ saved: true, rootHash, summary, message: 'Memory stored permanently on 0G Storage' });
+    res.json({
+      saved: true,
+      rootHash: result.rootHash,
+      txHash: result.txHash,
+      summary,
+      message: 'Memory stored permanently on 0G Storage',
+    });
   } catch (err) {
     console.error('Save session error:', err);
     res.status(500).json({ error: 'Failed to save session' });
@@ -134,7 +147,7 @@ router.get('/memory/:hash', authenticate, async (req: AuthRequest, res: Response
     // 1. Verify database index ownership first
     const { data: dbMemory, error: dbErr } = await supabase
       .from('mv_memories')
-      .select('user_id')
+      .select('user_id, tx_hash')
       .eq('root_hash', hash)
       .single();
 
@@ -154,7 +167,7 @@ router.get('/memory/:hash', authenticate, async (req: AuthRequest, res: Response
       return res.status(404).json({ error: 'Memory not found on 0G Storage' });
     }
 
-    res.json({ memory, hash });
+    res.json({ memory, hash, txHash: dbMemory.tx_hash });
   } catch (err) {
     console.error('Retrieve memory error:', err);
     res.status(500).json({ error: 'Failed to retrieve memory' });

@@ -14,15 +14,11 @@ function timeAgo(dateStr: string): string {
 const EXPLORER_BASE = 'https://storagescan-newton.0g.ai/tx/';
 
 export function MemoryCard({ memory, onClick }: Props) {
-  const isEncrypted = memory.title && memory.title.includes(':') && memory.title.length > 60;
-  const displayTitle = isEncrypted ? '🔐 Encrypted memory' : (memory.title || 'Untitled session');
-
-  // Derive a short preview snippet from the title when not encrypted
-  const previewSnippet = !isEncrypted && memory.title
-    ? memory.title.length > 80
-      ? memory.title.slice(0, 80) + '…'
-      : null   // title is short enough, no need for extra preview
-    : null;
+  const isEncrypted = !!(memory.title && memory.title.includes(':') && memory.title.length > 60);
+  const cardTitle = isEncrypted ? '🔐 Encrypted Memory' : '🧠 Conversation Memory';
+  const summaryText = isEncrypted
+    ? 'This memory is AES-256-GCM encrypted. Only your derived key can unlock and read it.'
+    : (memory.title || 'No summary available.');
 
   const hashShort = memory.root_hash.slice(0, 10) + '…';
   const explorerUrl = `${EXPLORER_BASE}${memory.root_hash}`;
@@ -47,21 +43,19 @@ export function MemoryCard({ memory, onClick }: Props) {
     >
       {/* Title row */}
       <div className="flex items-start justify-between gap-3 mb-1.5">
-        <p className="text-sm font-medium leading-snug flex-1 line-clamp-2"
-           style={{ color: '#1c1914' }}>
-          {displayTitle}
+        <p className="text-[10px] font-semibold uppercase tracking-wider"
+           style={{ color: '#6366f1' }}>
+          {cardTitle}
         </p>
         <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#c8b4a0' }}>
           {timeAgo(memory.created_at)}
         </span>
       </div>
 
-      {/* Snippet preview line */}
-      {previewSnippet && (
-        <p className="text-xs mb-2 leading-relaxed line-clamp-1" style={{ color: '#a8927f' }}>
-          {previewSnippet}
-        </p>
-      )}
+      {/* Summary preview */}
+      <p className="text-sm font-medium leading-relaxed mb-3" style={{ color: '#1c1914' }}>
+        {summaryText}
+      </p>
 
       {/* Footer row */}
       <div className="flex items-center gap-3">

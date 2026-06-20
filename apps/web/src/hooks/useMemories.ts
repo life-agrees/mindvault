@@ -16,6 +16,7 @@ export type FullMemory = {
   summary: string;
   timestamp: number;
   isEncrypted?: boolean;
+  txHash?: string | null;
 };
 
 export function useMemories() {
@@ -54,7 +55,9 @@ export function useMemoryDetail(hash: string | null) {
 
     api
       .get(`/chat/memory/${hash}`)
-      .then(({ data }) => setMemory(data.memory))
+      .then(({ data }) => {
+        setMemory(data.memory ? { ...data.memory, txHash: data.txHash } : null);
+      })
       .catch(() => setError('Could not load this memory from 0G Storage'))
       .finally(() => setIsLoading(false));
   }, [hash]);

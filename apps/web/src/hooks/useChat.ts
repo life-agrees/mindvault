@@ -9,6 +9,15 @@ export type ChatMessage = {
   isError?: boolean;
 };
 
+export type SessionHistoryItem = {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  timestamp: number;
+  lastSaveHash?: string | null;
+  lastSaveTx?: string | null;
+};
+
 export type ChatState = {
   messages: ChatMessage[];
   isThinking: boolean;
@@ -16,18 +25,28 @@ export type ChatState = {
   memoryLoaded: boolean;
   sessionCount: number;
   lastSaveHash: string | null;
+  lastSaveTx: string | null;
   toastMessage: string | null;
   clearToast: () => void;
   sendMessage: (text: string) => Promise<void>;
   retryMessage: () => Promise<void>;
   saveSession: () => Promise<void>;
   startNewSession: () => void;
+  sessionId: string;
+  recentSessions: SessionHistoryItem[];
+  loadSession: (session: SessionHistoryItem) => void;
 };
 
 const STORAGE_KEY = 'mv_active_session';
 
 function genId() {
   return Math.random().toString(36).slice(2);
+}
+
+function getSessionTitle(msgs: ChatMessage[]) {
+  const firstUser = msgs.find(m => m.role === 'user');
+  if (!firstUser) return 'New Chat';
+  return firstUser.content.length > 30 ? firstUser.content.slice(0, 28) + '...' : firstUser.content;
 }
 
 export function useChat(): ChatState {
@@ -40,15 +59,72 @@ export function useChat(): ChatState {
     }
   });
 
+  const [sessionId, setSessionId] = useState<string>(() => {
+    try {
+      const saved = sessionStorage.getItem('mv_active_session_id');
+      if (saved) return saved;
+      const newId = genId();
+      sessionStorage.setItem('mv_active_session_id', newId);
+      return newId;
+    } catch {
+      return genId();
+    }
+  });
+
+  const [recentSessions, setRecentSessions] = useState<SessionHistoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('mv_recent_sessions');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [isThinking, setIsThinking] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [memoryLoaded, setMemoryLoaded] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [lastSaveHash, setLastSaveHash] = useState<string | null>(null);
+  const [lastSaveTx, setLastSaveTx] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const dirtyRef = useRef(false);
 
   const clearToast = useCallback(() => setToastMessage(null), []);
+
+  // Sync current session changes to localStorage history
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    setRecentSessions((prev) => {
+      const existingIdx = prev.findIndex((s) => s.id === sessionId);
+      const title = getSessionTitle(messages);
+      const updatedItem: SessionHistoryItem = {
+        id: sessionId,
+        title,
+        messages,
+        timestamp: prev[existingIdx]?.timestamp || Date.now(),
+        lastSaveHash,
+        lastSaveTx,
+      };
+
+      let newHistory = [...prev];
+      if (existingIdx !== -1) {
+        newHistory[existingIdx] = updatedItem;
+      } else {
+        newHistory.unshift(updatedItem);
+      }
+
+      newHistory.sort((a, b) => b.timestamp - a.timestamp);
+      newHistory = newHistory.slice(0, 5);
+
+      try {
+        localStorage.setItem('mv_recent_sessions', JSON.stringify(newHistory));
+      } catch (err) {
+        console.error('Failed to save recent sessions to localStorage', err);
+      }
+      return newHistory;
+    });
+  }, [messages, sessionId, lastSaveHash, lastSaveTx]);
 
   // Persist to sessionStorage on every message change
   useEffect(() => {
@@ -145,6 +221,7 @@ export function useChat(): ChatState {
 
       if (data.saved) {
         setLastSaveHash(data.rootHash);
+        setLastSaveTx(data.txHash);
         dirtyRef.current = false;
         setToastMessage('✓ Memory stored on 0G — yours forever');
       }
@@ -156,12 +233,30 @@ export function useChat(): ChatState {
   }, [messages]);
 
   const startNewSession = useCallback(() => {
+    const newId = genId();
+    setSessionId(newId);
     setMessages([]);
     setLastSaveHash(null);
+    setLastSaveTx(null);
     setMemoryLoaded(false);
     setSessionCount(0);
     dirtyRef.current = false;
-    sessionStorage.removeItem(STORAGE_KEY);
+    try {
+      sessionStorage.setItem('mv_active_session_id', newId);
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  }, []);
+
+  const loadSession = useCallback((session: SessionHistoryItem) => {
+    setSessionId(session.id);
+    setMessages(session.messages);
+    setLastSaveHash(session.lastSaveHash || null);
+    setLastSaveTx(session.lastSaveTx || null);
+    dirtyRef.current = false;
+    try {
+      sessionStorage.setItem('mv_active_session_id', session.id);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session.messages));
+    } catch {}
   }, []);
 
   return {
@@ -171,11 +266,15 @@ export function useChat(): ChatState {
     memoryLoaded,
     sessionCount,
     lastSaveHash,
+    lastSaveTx,
     toastMessage,
     clearToast,
     sendMessage,
     retryMessage,
     saveSession,
     startNewSession,
+    sessionId,
+    recentSessions,
+    loadSession,
   };
 }

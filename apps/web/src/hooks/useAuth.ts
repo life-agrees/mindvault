@@ -16,7 +16,15 @@ export function useAuth() {
     const stored = localStorage.getItem('mv_user');
     return stored ? JSON.parse(stored) : null;
   });
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(() => {
+    try {
+      const stored = localStorage.getItem('mv_user');
+      const token = localStorage.getItem('mv_token');
+      return !stored || !token;
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     if (!ready || !authenticated || !user) return;

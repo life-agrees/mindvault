@@ -132,7 +132,10 @@ export type StoredMemory = {
   version: string;
 };
 
-export async function storeMemory(memory: StoredMemory, encryptionKey?: string): Promise<string | null> {
+export async function storeMemory(
+  memory: StoredMemory,
+  encryptionKey?: string
+): Promise<{ rootHash: string; txHash: string | null } | null> {
   try {
     const signer = getSigner();
     let content = JSON.stringify({ ...memory, storedAt: Date.now(), app: 'mindvault' });
@@ -184,19 +187,24 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
       return null;
     }
 
+    let txHash: string | null = null;
     try {
       const sdk2 = await getStorageSdk();
       const IndexerLocal = sdk2.Indexer ?? sdk2.default?.Indexer ?? sdk2.Indexer;
       const indexer = new IndexerLocal(STORAGE_RPC);
       const res = await indexer.upload(file, RPC, signer);
+      console.log('🔍 RAW UPLOAD RESULT:', JSON.stringify(res, (key, value) => typeof value === 'bigint' ? value.toString() : value, 2));
       if (Array.isArray(res)) {
-        const [, uploadErr] = res;
+        const [uploadResult, uploadErr] = res;
         if (uploadErr) {
           console.error('0G upload error (tuple):', uploadErr);
           try { await file.close?.(); } catch {}
           try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
           return null;
         }
+        txHash = typeof uploadResult === 'string'
+          ? uploadResult
+          : uploadResult?.txHash ?? null;
       }
     } catch (uploadErr) {
       console.error('0G upload exception:', errStr(uploadErr));
@@ -207,8 +215,8 @@ export async function storeMemory(memory: StoredMemory, encryptionKey?: string):
 
     try { await file.close?.(); } catch {}
     try { await fs.unlink(tmpPath).catch(() => {}); } catch {}
-    console.log('✅ Memory stored on 0G Storage:', rootHash);
-    return rootHash ?? null;
+    console.log('✅ Memory stored on 0G Storage. Root:', rootHash, '| Tx:', txHash);
+    return { rootHash: rootHash ?? '', txHash };
   } catch (err) {
     console.warn('0G storage failed:', errStr(err));
     return null;

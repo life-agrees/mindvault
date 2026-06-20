@@ -6,9 +6,13 @@ import Chat from './pages/Chat';
 import Memories from './pages/Memories';
 import { SplashScreen } from './components/ui/SplashScreen';
 
+import { useAuth } from './hooks/useAuth';
+
 function Protected({ children }: { children: React.ReactNode }) {
   const { ready, authenticated } = usePrivy();
-  if (!ready) return <SplashScreen />;
+  const { mvUser, isSyncing } = useAuth();
+
+  if (!ready || isSyncing || !mvUser) return <SplashScreen />;
   return authenticated ? <>{children}</> : <Navigate to="/" replace />;
 }
 
