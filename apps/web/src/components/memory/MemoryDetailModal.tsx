@@ -10,7 +10,7 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
       {/* Overlay */}
       <div className="absolute inset-0 backdrop-blur-sm"
-           style={{ background: 'rgba(28,20,14,0.35)' }} />
+        style={{ background: 'rgba(28,20,14,0.35)' }} />
 
       {/* Sheet */}
       <div
@@ -25,20 +25,20 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
       >
         {/* Handle */}
         <div className="w-10 h-1 rounded-full mx-auto mt-3 mb-1 flex-shrink-0"
-             style={{ background: 'rgba(120,95,68,0.2)' }} />
+          style={{ background: 'rgba(120,95,68,0.2)' }} />
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 flex-shrink-0"
-             style={{ borderBottom: '1px solid rgba(120,95,68,0.10)' }}>
+          style={{ borderBottom: '1px solid rgba(120,95,68,0.10)' }}>
           <div>
             <p className="font-bold text-base" style={{ color: '#1c1914' }}>Memory Detail</p>
             <div className="flex items-center gap-1.5 mt-1">
               <div className="w-3.5 h-3.5 rounded-sm flex items-center justify-center"
-                   style={{ background: 'rgba(99,102,241,0.7)' }}>
+                style={{ background: 'rgba(99,102,241,0.7)' }}>
                 <span className="text-white text-[7px] font-bold">0G</span>
               </div>
               <a
-                href={`https://storagescan-newton.0g.ai/tx/${hash}`}
+                href={`https://storagescan-galileo.0g.ai/tx/${hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-mono underline hover:text-[#6366f1] transition-colors"
@@ -65,14 +65,14 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <div className="w-6 h-6 rounded-full border-2 animate-spin"
-                   style={{ borderColor: '#6366f1', borderTopColor: 'transparent' }} />
+                style={{ borderColor: '#6366f1', borderTopColor: 'transparent' }} />
               <p className="text-xs" style={{ color: '#a8927f' }}>Retrieving from 0G Storage…</p>
             </div>
           )}
 
           {error && (
             <div className="rounded-xl p-4 text-center"
-                 style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)' }}>
+              style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)' }}>
               <p className="text-sm" style={{ color: '#dc2626' }}>{error}</p>
             </div>
           )}
@@ -82,7 +82,7 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
               {memory.isEncrypted ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-                       style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                    style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
                     🔐
                   </div>
                   <div className="text-center">
@@ -97,9 +97,9 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                   {/* Summary */}
                   {memory.summary && (
                     <div className="rounded-xl p-3.5"
-                         style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.12)' }}>
+                      style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.12)' }}>
                       <p className="text-xs font-semibold uppercase tracking-wider mb-1"
-                         style={{ color: '#6366f1' }}>Summary</p>
+                        style={{ color: '#6366f1' }}>Summary</p>
                       <p className="text-sm leading-relaxed" style={{ color: '#5c4f42' }}>{memory.summary}</p>
                     </div>
                   )}
@@ -108,12 +108,12 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                   <div className="flex flex-col gap-2 mt-1">
                     {(memory.messages || []).map((msg, i) => (
                       <div key={i} className="rounded-xl px-3.5 py-2.5 text-sm"
-                           style={msg.role === 'user'
-                             ? { background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)', marginLeft: '2rem' }
-                             : { background: '#f5f0e8', border: '1px solid rgba(120,95,68,0.12)', marginRight: '2rem' }
-                           }>
+                        style={msg.role === 'user'
+                          ? { background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)', marginLeft: '2rem' }
+                          : { background: '#f5f0e8', border: '1px solid rgba(120,95,68,0.12)', marginRight: '2rem' }
+                        }>
                         <p className="text-xs mb-1 font-semibold uppercase tracking-wide"
-                           style={{ color: '#c8b4a0' }}>
+                          style={{ color: '#c8b4a0' }}>
                           {msg.role === 'user' ? 'You' : 'MindVault'}
                         </p>
                         <p className="leading-relaxed" style={{ color: '#3d3028' }}>{msg.content}</p>
@@ -124,16 +124,16 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                   {/* On-chain Transaction Proof */}
                   {memory.txHash && (
                     <div className="rounded-xl p-3.5 mt-2 flex items-center justify-between"
-                         style={{ background: 'rgba(120,95,68,0.05)', border: '1px solid rgba(120,95,68,0.10)' }}>
+                      style={{ background: 'rgba(120,95,68,0.05)', border: '1px solid rgba(120,95,68,0.10)' }}>
                       <div className="min-w-0 flex-1 pr-3">
                         <p className="text-[10px] font-semibold uppercase tracking-wider"
-                           style={{ color: '#8a745f' }}>On-Chain Transaction</p>
+                          style={{ color: '#8a745f' }}>On-Chain Transaction</p>
                         <p className="text-[11px] font-mono mt-0.5 truncate" style={{ color: '#a8927f' }}>
                           {memory.txHash}
                         </p>
                       </div>
                       <a
-                        href={`https://chainscan-newton.0g.ai/tx/${memory.txHash}`}
+                        href={`https://chainscan-galileo.0g.ai/tx/${memory.txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-colors flex-shrink-0"
@@ -148,7 +148,7 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
 
                   {/* Footer */}
                   <div className="text-center pt-3 pb-1 mt-2"
-                       style={{ borderTop: '1px solid rgba(120,95,68,0.10)' }}>
+                    style={{ borderTop: '1px solid rgba(120,95,68,0.10)' }}>
                     <p className="text-xs leading-relaxed" style={{ color: '#c8b4a0' }}>
                       Permanently stored on 0G's decentralized network.<br />
                       No one can alter or delete it.
