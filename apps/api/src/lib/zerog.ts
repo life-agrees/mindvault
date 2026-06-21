@@ -223,7 +223,7 @@ export async function storeMemory(
   }
 }
 
-export async function loadMemory(rootHash: string, encryptionKey?: string): Promise<StoredMemory | null> {
+export async function loadMemory(rootHash: string, encryptionKey?: string, userId?: string): Promise<StoredMemory | null> {
   const tmpName = `mindvault-download-${rootHash}-${Date.now()}.json`;
   const tmpPath = path.join(os.tmpdir(), tmpName);
   try {
@@ -244,13 +244,31 @@ export async function loadMemory(rootHash: string, encryptionKey?: string): Prom
     
     if (!content.trim().startsWith('{')) {
       // Content is encrypted
+      const { decryptAES, deriveKeyFromSignature } = await import('./crypto');
+
+      // 1. Try decrypting with client-provided key (e.g. new wallet-signature key)
       if (encryptionKey) {
-        const { decryptAES } = await import('./crypto');
-        content = decryptAES(content, encryptionKey);
-        return JSON.parse(content) as StoredMemory;
-      } else {
-        return { isEncrypted: true, ciphertext: content } as any;
+        try {
+          const decrypted = decryptAES(content, encryptionKey);
+          return JSON.parse(decrypted) as StoredMemory;
+        } catch (decErr) {
+          console.warn(`Decryption with primary key failed for root ${rootHash}, trying legacy DID fallback...`);
+        }
       }
+
+      // 2. Try decrypting with legacy DID key fallback
+      if (userId) {
+        try {
+          const fallbackKey = deriveKeyFromSignature(userId);
+          const decrypted = decryptAES(content, fallbackKey);
+          return JSON.parse(decrypted) as StoredMemory;
+        } catch (fallbackErr) {
+          console.warn(`Decryption with legacy DID key failed for root ${rootHash}`);
+        }
+      }
+
+      // 3. If no decryption succeeded, return it as encrypted
+      return { isEncrypted: true, ciphertext: content } as any;
     }
     
     return JSON.parse(content) as StoredMemory;

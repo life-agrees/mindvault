@@ -70,7 +70,7 @@ export async function loadUserMemories(userId: string, encryptionKey?: string): 
     (memoryIndex as any[]).map(async (idx) => {
       const root = idx.root_hash;
       console.log('Attempting to load memory from root_hash:', root);
-      const mem = await loadMemory(root, encryptionKey);
+      const mem = await loadMemory(root, encryptionKey, userId);
       if (!mem) console.error('Failed to load memory for root_hash:', root);
       return mem;
     })

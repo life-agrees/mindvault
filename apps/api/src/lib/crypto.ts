@@ -38,3 +38,12 @@ export function decryptAES(encryptedStr: string, keyHex: string): string {
   plaintext += decipher.final('utf8');
   return plaintext;
 }
+
+/**
+ * Derives a 256-bit AES key from any seed string (e.g. user DID) via SHA-256.
+ * Matches the frontend's Web Crypto SHA-256 key derivation.
+ */
+export function deriveKeyFromSignature(seed: string): string {
+  return crypto.createHash('sha256').update(seed, 'utf8').digest('hex');
+}
+

@@ -161,7 +161,7 @@ router.get('/memory/:hash', authenticate, async (req: AuthRequest, res: Response
 
     // 2. Fetch from 0G Storage
     const { loadMemory } = await import('../lib/zerog');
-    const memory = await loadMemory(hash, encryptionKey);
+    const memory = await loadMemory(hash, encryptionKey, req.user!.userId);
 
     if (!memory) {
       return res.status(404).json({ error: 'Memory not found on 0G Storage' });
