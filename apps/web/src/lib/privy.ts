@@ -8,6 +8,6 @@ export const privyConfig: PrivyClientConfig = {
     showWalletLoginFirst: false,
   },
   embeddedWallets: {
-    createOnLogin: 'off', // Identity only — key derived from privyDid
+    createOnLogin: 'users-without-wallets',
   },
 };

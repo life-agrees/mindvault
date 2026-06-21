@@ -11,7 +11,7 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-const EXPLORER_BASE = 'https://storagescan-newton.0g.ai/tx/';
+const EXPLORER_BASE = 'https://storagescan-galileo.0g.ai/file/';
 
 export function MemoryCard({ memory, onClick }: Props) {
   const isEncrypted = !!(memory.title && memory.title.includes(':') && memory.title.length > 60);

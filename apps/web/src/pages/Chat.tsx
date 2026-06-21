@@ -204,7 +204,7 @@ export default function Chat() {
                   <span className="text-white" style={{ fontSize: '6px', fontWeight: 700 }}>0G</span>
                 </div>
                 <a
-                  href={`https://storagescan-newton.0g.ai/tx/${chat.lastSaveHash}`}
+                  href={`https://storagescan-galileo.0g.ai/file/${chat.lastSaveHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[10px] font-mono truncate transition-colors"

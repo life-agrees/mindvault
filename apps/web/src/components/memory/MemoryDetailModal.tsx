@@ -37,8 +37,8 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                 style={{ background: 'rgba(99,102,241,0.7)' }}>
                 <span className="text-white text-[7px] font-bold">0G</span>
               </div>
-              <a
-                href={`https://storagescan-galileo.0g.ai/tx/${hash}`}
+               <a
+                href={`https://storagescan-galileo.0g.ai/file/${hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-mono underline hover:text-[#6366f1] transition-colors"
