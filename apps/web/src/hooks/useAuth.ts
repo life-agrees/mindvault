@@ -91,6 +91,26 @@ export function useAuth() {
         }
       };
       deriveKey();
+    } else {
+      // Set a fallback timeout (e.g. 2.5 seconds) in case no Privy wallet is provisioned or found.
+      // This prevents the user from being stuck on the SplashScreen forever.
+      const timer = setTimeout(() => {
+        if (!sessionStorage.getItem('mv_encryption_key') && !hasAttemptedRef.current) {
+          console.warn('⚠️ No Privy wallet found after timeout. Falling back to DID-based derivation.');
+          hasAttemptedRef.current = true;
+          deriveKeyFromSignature(user.id)
+            .then((key) => {
+              sessionStorage.setItem('mv_encryption_key', key);
+              setKeyDeriving(false);
+            })
+            .catch((err) => {
+              console.error('Fallback key derivation failed:', err);
+              setKeyDeriving(false);
+            });
+        }
+      }, 2500);
+
+      return () => clearTimeout(timer);
     }
   }, [ready, authenticated, user, wallets, keyDeriving]);
 
