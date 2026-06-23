@@ -234,7 +234,7 @@ export default function Chat() {
               </div>
               {chat.lastSaveTx && (
                 <a
-                  href={`https://chainscan-newton.0g.ai/tx/${chat.lastSaveTx}`}
+                  href={`https://chainscan-galileo.0g.ai/tx/${chat.lastSaveTx}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[9px] underline underline-offset-2 transition-colors"

@@ -95,7 +95,7 @@ export function MemoryCard({ memory, onClick }: Props) {
         {/* On-chain proof badge */}
         {memory.tx_hash && (
           <a
-            href={`https://chainscan-newton.0g.ai/tx/${memory.tx_hash}`}
+            href={`https://chainscan-galileo.0g.ai/tx/${memory.tx_hash}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}

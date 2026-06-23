@@ -52,7 +52,7 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
         rootHash: idx.root_hash,
         txHash: idx.tx_hash,
         storageUrl: `https://storagescan-galileo.0g.ai/file/${idx.root_hash}`,
-        chainUrl: idx.tx_hash ? `https://chainscan-newton.0g.ai/tx/${idx.tx_hash}` : null,
+        chainUrl: idx.tx_hash ? `https://chainscan-galileo.0g.ai/tx/${idx.tx_hash}` : null,
       })),
       // Personality derived from summaries
       personality: {

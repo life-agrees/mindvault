@@ -1,66 +1,78 @@
-Submission snapshot: 06f8e4742fd9df19095cde1eaec81f7f8d61a95a
-Tag: submission-2026-06-18-06f8e47
+# Submission Instructions & Verification 🧠
 
-Quick run instructions
+**Submission Snapshot:** `a5f14cd437e117517297cd9382fce675c6932652`
+**Latest Tag:** `submission-2026-06-23-a5f14cd`
+**Walkthrough Video:** [Watch the YouTube Short Walkthrough](https://youtube.com/shorts/L20Mj668dc0?si=bhGKYH-HyhniXraU)
 
-- Install dependencies (root uses pnpm):
+---
 
+## 🚀 Quick Run Instructions
+
+### 1. Install Dependencies
+Run from the root directory to install all monorepo dependencies:
 ```bash
 pnpm install
 ```
 
-- Start the API and web locally (concurrently in two terminals):
+### 2. Configure Environment Variables
+Create `.env` files in both workspace directories using the provided examples:
+* For the Backend: Copy `apps/api/.env.example` to `apps/api/.env` and populate it.
+* For the Frontend: Copy `apps/web/.env.example` to `apps/web/.env` and populate it.
 
+### 3. Start Development Servers
+Start both the Frontend and the API Backend concurrently from the root directory:
 ```bash
-# Terminal 1 - API
-cd apps/api
-pnpm dev
-
-# Terminal 2 - Web
-cd apps/web
 pnpm dev
 ```
 
-- Production start (API):
-
+### 4. Build for Production
+To build both packages concurrently:
 ```bash
-cd apps/api
-pnpm build
-pnpm start
+pnpm -r build
 ```
 
-Required env vars (see `apps/api/.env.example`) — do NOT commit secrets.
+---
 
-Testing endpoints
+## 🧪 Testing & Verification
 
-- Test 0G compute directly (replace key):
-
+### 1. Verify 0G Compute Directly
+Use this curl command to test 0G Compute router connectivity (replace with your proxy/router endpoint and api key):
 ```bash
-ENDPOINT="https://router-api.0g.ai/v1"
-KEY="app-sk-..."
+ENDPOINT="https://router-api.0g.ai/v1" # or your specific proxy endpoint
+KEY="app-sk-..."                      # your 0G compute API key
 curl -v -X POST "$ENDPOINT/chat/completions" \
   -H "Authorization: Bearer $KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"qwen/qwen2.5-omni-7b","messages":[{"role":"system","content":"test"},{"role":"user","content":"hello"}]}'
 ```
 
-- Test the deployed API (replace host + JWT):
-
+### 2. Verify Deployed API Endpoints
+To test the message and memory pipeline via the API (replace host and user JWT token):
 ```bash
 API_HOST="https://<your-api-host>"
 JWT="<user_jwt>"
 curl -v -X POST "$API_HOST/chat/message" \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
-  -d '{"message":"hello","sessionMessages":[]} '
+  -d '{"message":"hello","sessionMessages":[]}'
 ```
 
-Notes for judges
+### 3. Automated End-to-End Test Scripts
+We have included automated testing scripts inside `apps/api/` that test the entire integration and encryption flows:
+```bash
+cd apps/api
 
-- The repo uses 0G Compute + 0G Storage. Provide valid 0G keys for compute and storage (testnet keys are fine).
-- Replace any leaked keys (the contributor rotated secrets after submission). See `apps/api/.env.example` for required env names.
-- If you cannot access 0G, set `GROQ_API_KEY` to use the fallback Groq endpoint (or remove fallback to use local echo).
+# Test basic auth, chat messaging, and 0G memory storage
+node scripts/e2e.js
 
-Contact
+# Test E2EE AES-256-GCM encryption, decryption, and ciphertext protection
+node scripts/e2e-encryption.js
+```
 
-If you need a runnable demo or zip, ask and I will produce `submission-06f8e47.zip` or a short demo video.
+---
+
+## ⚖️ Notes for Judges
+* **Zero-Knowledge Backend:** All memories are encrypted client-side in the browser using keys derived from the user's Privy embedded EVM wallet signature (`wallet.signMessage`). The backend only processes and stores ciphertext.
+* **0G Networks Used:** The application requires 0G Compute (for LLM inference) and 0G Storage/0G Chain (for decentralized, verifiable memory anchors).
+* **Galileo Testnet Support:** Transaction verification links correctly point to `https://chainscan-galileo.0g.ai/tx/` and file details to `https://storagescan-galileo.0g.ai/file/`.
+* **Graceful Fallbacks:** If you do not have 0G API credentials active, you can define a `GROQ_API_KEY` in the API env to run on fallback, or run in local mock mode by setting `DEV_AUTH=true`.

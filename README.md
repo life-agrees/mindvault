@@ -1,83 +1,108 @@
 # MindVault 🧠
 
-**The AI that actually remembers you — and you own every memory.**
+**The AI companion that actually remembers you — owned and verified by you.**
 
-Built for The Zero Cup · 0G's Global Vibe Coding Tournament
+Built for **The Zero Cup** · 0G's Global Vibe Coding Tournament
+
+[![Demo Video](https://img.shields.io/badge/Demo_Video-YouTube-red?style=for-the-badge&logo=youtube)](https://youtube.com/shorts/L20Mj668dc0?si=bhGKYH-HyhniXraU)
 
 ---
 
-## The Problem
+## 📺 Demo Video & Links
+* **Watch the Walkthrough Video:** [YouTube Short Demo](https://youtube.com/shorts/L20Mj668dc0?si=bhGKYH-HyhniXraU)
+* **Live App Link:** [mindvault-demo.vercel.app](https://mindvault-demo.vercel.app)
 
-Every AI assistant you use today has amnesia. Close ChatGPT, come back 
-tomorrow — it doesn't remember your name, your goals, or what you talked 
-about. Worse: even if it did remember, that memory lives on someone 
-else's server. They can delete it, sell it, or shut down and take your 
-data with them.
+---
 
-## What MindVault Does
+## 🧠 The Problem
+Every AI assistant today has amnesia. Close ChatGPT, lose your context. Sign out of Gemini, it forgets you exist. Even if they do remember, that memory lives on a corporate database where it can be analyzed, deleted, or sold.
 
-MindVault is a personal AI companion built entirely on 0G's decentralized 
-network:
+**MindVault fixes this by decoupling AI intelligence from memory storage.** Your companion remembers you permanently, but the memory database doesn't live on our servers — it belongs entirely to you on **0G's decentralized network**.
 
-- **0G Compute** runs every AI inference — no centralized AI server
-- **0G Storage** permanently stores every conversation — you own it, 
-  cryptographically
-- Close the app for months, come back — MindVault remembers everything, 
-  verifiable by a hash only you can access
+---
 
-Remove 0G from this app and it stops working entirely. There's no 
-database storing your conversations — there's only a 0G Storage root 
-hash, indexed so you can find it.
+## 🚀 Key Features
 
-## How It Works
-You send a message
+### 🔐 1. Client-Side End-to-End Encryption (E2EE)
+* **Wallet-Secured Keys:** Every memory is encrypted in the browser using a symmetric key derived cryptographically from your Privy embedded EVM wallet signature (`wallet.signMessage`).
+* **Zero-Knowledge Backend:** The backend only sees and uploads opaque AES-256-GCM ciphertext to 0G Storage. Even the memory titles indexed in the database are fully encrypted.
+* **Backward Compatibility:** Seamlessly falls back to legacy DID-based key derivation to decrypt older memories.
+* **Self-Healing Key Timeout:** Falls back to DID-based derivation if wallet connection takes longer than 2.5 seconds to prevent onboarding hangs.
 
-↓
+### 🔗 2. Dual-Layer On-Chain Verifiability
+* **StorageScan Links:** Easily navigate to the exact 0G storage location to verify your raw data block at `storagescan-galileo.0g.ai/file/[root_hash]`.
+* **ChainScan Galileo Links:** Inspect the EVM smart contract transaction verifying execution of your memory block storage on the blockchain at `chainscan-galileo.0g.ai/tx/[tx_hash]`.
+* **Verifiable UI Badges:** Real-time visual cards and immutable stamps detail your transaction roots.
 
-0G Compute (Llama 3.3 70B) generates a response with full memory context
+### 🧠 3. Agent Personality Export & Import (SNAP Snapshot)
+* **Export SNAP Snapshot:** Download your companion's memory fingerprints, topic logs, and 0G cryptographic proof anchors as a portable JSON profile.
+* **Restore Context:** Import a snapshot to instantly align a new session with your AI's custom personality snapshot.
+* **Privacy-First:** SNAP snapshots contain only AI summaries and anchors — never raw message content.
 
-↓
+### 📱 4. Premium Responsive UX & Performance
+* **Visual Viewport Adaptive Typing:** Smooth scrolling keeps messages pinned above the keyboard when typing on mobile.
+* **Parchment Theme Splash Screen:** Soft, pulsing load states keep onboarding delightful during signature/key derivation.
+* **Temporal Awareness:** Real-time current date/time injected dynamically into 0G Compute prompts so the LLM understands relative dates.
+* **Robust Error Boundaries:** Parchment-styled error boundaries ensure gracefully trapped errors instead of white screens.
 
-After each exchange, the full conversation is hashed and stored 
-permanently on 0G Storage
+---
 
-↓
+## 🛠️ Architecture
 
-Next session, MindVault loads your memory history from 0G and 
-greets you like it never forgot
-
-## Tech Stack
-
-- **Frontend:** React + Vite + TailwindCSS
-- **Backend:** Node.js + Express + TypeScript
-- **Auth:** Privy (Google/email login)
-- **AI Inference:** 0G Compute Network (Llama 3.3 70B)
-- **Storage:** 0G Storage (decentralized, permanent)
-- **Index:** Supabase (stores only hash pointers, never content)
-
-## Running Locally
-
-```bash
-git clone <repo-url>
-cd mindvault
-pnpm install
-
-# Set up environment variables in apps/web/.env and apps/api/.env
-# See .env.example in each folder
-
-pnpm dev
+```
+[ User Prompt ]
+       │
+       ▼
+[ Privy Auth & E2EE Key Derivation ] ──(Symmetric Key)
+       │
+       ▼
+[ 0G Compute (Llama-3.3-70B) ] ──(Generates Response)
+       │
+       ▼
+[ Client-Side Encryption (AES-256-GCM) ]
+       │
+       ▼
+[ 0G Storage ] ──(Saves Ciphertext Root Hash)
+       │
+       ▼
+[ 0G Chain (Newton Testnet) ] ──(Publishes Transaction Proof)
 ```
 
-## Live Demo
+---
 
-[mindvault-demo.vercel.app](#)
+## 💻 Tech Stack
+* **Frontend:** React + Vite + TailwindCSS (styled with custom warm parchment palette)
+* **Backend:** Node.js + Express + TypeScript
+* **Auth:** Privy (embedded wallets, social & email login)
+* **AI Inference:** 0G Compute Network (Llama 3.3 70B)
+* **Storage:** 0G Storage (decentralized, verifiable, permanent)
+* **Database:** Supabase (stores only hash pointers and encrypted metadata)
 
-## Demo Video
+---
 
-[Watch the 2-minute walkthrough](#)
+## ⚙️ Running Locally
 
-## What's Next
+1. **Clone the Repo:**
+   ```bash
+   git clone https://github.com/life-agrees/mindvault.git
+   cd mindvault
+   ```
 
-- 0G Chain integration for on-chain memory ownership verification
-- Export/share specific memories via their 0G hash
-- Multi-modal memory — voice and image context stored on 0G
+2. **Install Dependencies:**
+   ```bash
+   pnpm install
+   ```
+
+3. **Configure Environment Variables:**
+   * Create `apps/web/.env` and copy variables from `apps/web/.env.example`.
+   * Create `apps/api/.env` and copy variables from `apps/api/.env.example`.
+
+4. **Start Development Servers:**
+   ```bash
+   pnpm dev
+   ```
+
+5. **Build for Production:**
+   ```bash
+   pnpm -r build
+   ```

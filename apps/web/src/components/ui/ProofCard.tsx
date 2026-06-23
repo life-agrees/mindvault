@@ -31,7 +31,7 @@ export function ProofCard({ rootHash, txHash, compact = false }: ProofCardProps)
         </a>
         {txHash && (
           <a
-            href={`https://chainscan-newton.0g.ai/tx/${txHash}`}
+            href={`https://chainscan-galileo.0g.ai/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[9px] font-semibold px-1.5 py-0.5 rounded-md transition-colors flex-shrink-0"
@@ -104,7 +104,7 @@ export function ProofCard({ rootHash, txHash, compact = false }: ProofCardProps)
             0G Chain Transaction
           </p>
           <a
-            href={`https://chainscan-newton.0g.ai/tx/${txHash}`}
+            href={`https://chainscan-galileo.0g.ai/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[11px] font-mono px-2.5 py-1.5 rounded-lg flex items-center gap-2 transition-all"

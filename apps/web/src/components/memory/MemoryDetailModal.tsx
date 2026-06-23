@@ -168,7 +168,7 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                           On-Chain Transaction
                         </p>
                         <a
-                          href={`https://chainscan-newton.0g.ai/tx/${memory.txHash}`}
+                          href={`https://chainscan-galileo.0g.ai/tx/${memory.txHash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] font-mono px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
