@@ -1,4 +1,5 @@
 import { useMemoryDetail } from '../../hooks/useMemories';
+import { ProofCard } from '../ui/ProofCard';
 
 type Props = { hash: string | null; onClose: () => void };
 
@@ -122,77 +123,7 @@ export function MemoryDetailModal({ hash, onClose }: Props) {
                   </div>
 
                   {/* On-chain Transaction Proof - full proof card */}
-                  <div className="rounded-xl p-3.5 mt-2 flex flex-col gap-2.5"
-                    style={{ background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.14)' }}>
-                    {/* Header */}
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-md flex items-center justify-center flex-shrink-0"
-                        style={{ background: '#6366f1' }}>
-                        <span className="text-white font-bold" style={{ fontSize: '7px' }}>0G</span>
-                      </div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#6366f1' }}>
-                        Verified on 0G Network
-                      </p>
-                      <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                        style={{ background: 'rgba(34,197,94,0.12)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.25)' }}>
-                        ✓ IMMUTABLE
-                      </span>
-                    </div>
-
-                    {/* Storage root */}
-                    <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-wider mb-1" style={{ color: '#a8927f' }}>
-                        0G Storage Root Hash
-                      </p>
-                      <a
-                        href={`https://storagescan-galileo.0g.ai/file/${hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-mono px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
-                        style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)', color: '#6366f1' }}
-                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)')}
-                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(99,102,241,0.12)')}
-                      >
-                        <span className="truncate">{hash}</span>
-                        <svg className="w-3 h-3 flex-shrink-0 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-                    </div>
-
-                    {/* Chain tx */}
-                    {memory.txHash && (
-                      <div>
-                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-1" style={{ color: '#a8927f' }}>
-                          On-Chain Transaction
-                        </p>
-                        <a
-                          href={`https://chainscan-galileo.0g.ai/tx/${memory.txHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] font-mono px-2 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
-                          style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)', color: '#16a34a' }}
-                          onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(34,197,94,0.35)')}
-                          onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(34,197,94,0.15)')}
-                        >
-                          <span className="truncate">{memory.txHash}</span>
-                          <svg className="w-3 h-3 flex-shrink-0 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        </a>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 pt-1"
-                      style={{ borderTop: '1px solid rgba(99,102,241,0.10)' }}>
-                      <span style={{ fontSize: '10px' }}>⚡</span>
-                      <p className="text-[9px]" style={{ color: '#a8927f' }}>
-                        Response via <strong style={{ color: '#6b5a49' }}>0G Compute</strong> · Stored on <strong style={{ color: '#6b5a49' }}>0G Storage</strong>
-                      </p>
-                    </div>
-                  </div>
+                  <ProofCard rootHash={hash} txHash={memory.txHash} />
 
                   {/* Footer */}
                   <div className="text-center pt-3 pb-1 mt-2"

@@ -8,6 +8,7 @@ import { TypingIndicator } from '../components/chat/TypingIndicator';
 import { ChatInput } from '../components/chat/ChatInput';
 import { MemoryStatusBar } from '../components/chat/MemoryStatusBar';
 import { PersonalityPanel } from '../components/memory/PersonalityPanel';
+import { ProofCard } from '../components/ui/ProofCard';
 
 export default function Chat() {
   const { logout: privyLogout } = usePrivy();
@@ -214,38 +215,8 @@ export default function Chat() {
           )}
 
           {chat.lastSaveHash && !chat.isSaving && (
-            <div className="flex flex-col gap-1 mb-2">
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm flex items-center justify-center flex-shrink-0"
-                     style={{ background: 'rgba(99,102,241,0.65)' }}>
-                  <span className="text-white" style={{ fontSize: '6px', fontWeight: 700 }}>0G</span>
-                </div>
-                <a
-                  href={`https://storagescan-galileo.0g.ai/file/${chat.lastSaveHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] font-mono truncate transition-colors"
-                  style={{ color: '#c8b4a0' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
-                  onMouseLeave={e => e.currentTarget.style.color = '#c8b4a0'}
-                  title="View on 0G Storage Explorer"
-                >
-                  {chat.lastSaveHash.slice(0, 10)}…
-                </a>
-              </div>
-              {chat.lastSaveTx && (
-                <a
-                  href={`https://chainscan-galileo.0g.ai/tx/${chat.lastSaveTx}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[9px] underline underline-offset-2 transition-colors"
-                  style={{ color: '#a8927f', paddingLeft: '18px' }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#6366f1'}
-                  onMouseLeave={e => e.currentTarget.style.color = '#a8927f'}
-                >
-                  View on-chain →
-                </a>
-              )}
+            <div className="mb-3">
+              <ProofCard rootHash={chat.lastSaveHash} txHash={chat.lastSaveTx} compact={true} />
             </div>
           )}
 

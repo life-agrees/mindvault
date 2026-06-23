@@ -57,7 +57,7 @@ export function ChatInput({ onSend, disabled, onSave, isSaving, canSave }: Props
   return (
     <div>
       <div
-        className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all duration-200"
+        className="flex items-end gap-2 rounded-2xl px-4 py-2.5 transition-all duration-200"
         style={{
           background: '#fefcf8',
           border: `1px solid ${getBorderStyle()}`,
@@ -72,7 +72,7 @@ export function ChatInput({ onSend, disabled, onSave, isSaving, canSave }: Props
           placeholder="Tell MindVault anything..."
           rows={1}
           disabled={disabled}
-          className="flex-1 bg-transparent text-base sm:text-sm outline-none resize-none py-1.5 max-h-[120px]"
+          className="flex-1 bg-transparent text-base sm:text-sm outline-none resize-none py-1.5 pl-1.5 max-h-[120px]"
           style={{ color: '#1c1914', fontFamily: 'Inter, sans-serif', fontSize: '16px' }}
         />
 

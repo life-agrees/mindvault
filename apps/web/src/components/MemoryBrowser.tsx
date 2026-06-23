@@ -3,6 +3,7 @@ import { listMemoriesApi, getMemoryApi } from '../lib/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import Fuse from 'fuse.js'
 import { Search, X, ExternalLink, Download, Merge, Lock } from 'lucide-react'
+import { ProofCard } from './ui/ProofCard'
 
 interface Props {
   onClose: () => void
@@ -192,9 +193,11 @@ export default function MemoryBrowser({ onClose, onLoad }: Props) {
                   </>
                 )}
                 {previewHash && (
-                  <div className="hash-proof" style={{ marginTop: 'auto', paddingTop: 12 }}>
-                    <ExternalLink size={10} />
-                    <span title={previewHash}>{previewHash.slice(0, 20)}…</span>
+                  <div style={{ marginTop: 'auto', paddingTop: 12 }}>
+                    <ProofCard 
+                      rootHash={previewHash} 
+                      txHash={memRef.current.find(m => m.root_hash === previewHash)?.tx_hash} 
+                    />
                   </div>
                 )}
               </>
