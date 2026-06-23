@@ -6,6 +6,7 @@ export type MemoryIndexItem = {
   session_id: string;
   title: string;
   root_hash: string;
+  tx_hash?: string | null;
   message_count: number;
   created_at: string;
 };

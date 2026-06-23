@@ -6,6 +6,7 @@ dotenv.config();
 
 import authRouter from './routes/auth';
 import chatRouter from './routes/chat';
+import profileRouter from './routes/profile';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -32,6 +33,7 @@ app.use(express.json({ limit: '10mb' }));
 
 app.use('/auth', authRouter);
 app.use('/chat', chatRouter);
+app.use('/profile', profileRouter);
 
 app.get('/health', (req, res) => {
   res.json({

@@ -58,7 +58,7 @@ export function MemoryCard({ memory, onClick }: Props) {
       </p>
 
       {/* Footer row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 flex-wrap">
         <span className="text-xs" style={{ color: '#a8927f' }}>
           {memory.message_count} messages
         </span>
@@ -92,7 +92,24 @@ export function MemoryCard({ memory, onClick }: Props) {
           </svg>
         </a>
 
-        {isEncrypted && (
+        {/* On-chain proof badge */}
+        {memory.tx_hash && (
+          <a
+            href={`https://chainscan-newton.0g.ai/tx/${memory.tx_hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            title="View on-chain transaction"
+            className="flex items-center gap-1 ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-md transition-colors"
+            style={{ background: 'rgba(34,197,94,0.10)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.20)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.18)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.10)')}
+          >
+            ✓ on-chain
+          </a>
+        )}
+
+        {isEncrypted && !memory.tx_hash && (
           <span className="ml-auto text-[10px] font-semibold rounded px-1.5 py-0.5"
                 style={{ color: '#16a34a', background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.18)' }}>
             E2EE
@@ -102,3 +119,4 @@ export function MemoryCard({ memory, onClick }: Props) {
     </button>
   );
 }
+
