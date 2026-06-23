@@ -66,6 +66,14 @@ export default function Chat() {
   return (
     <div className="h-screen w-full flex overflow-hidden relative" style={{ background: '#f5f0e8' }}>
 
+      {/* Decorative ambient lighting orbs (0G color theme + parchment) */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] rounded-full blur-[100px] opacity-25"
+             style={{ background: 'radial-gradient(circle, rgba(212,196,168,0.45) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-10 right-1/4 w-[550px] h-[550px] rounded-full blur-[120px] opacity-30"
+             style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)' }} />
+      </div>
+
       {/* Backdrop for mobile */}
       {sidebarOpen && (
         <div

@@ -21,14 +21,17 @@ export default function App() {
   if (!ready) return <SplashScreen />;
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={authenticated ? <Navigate to="/chat" replace /> : <Onboarding />}
-      />
-      <Route path="/chat" element={<Protected><Chat /></Protected>} />
-      <Route path="/memories" element={<Protected><Memories /></Protected>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <div className="paper-grain" />
+      <Routes>
+        <Route
+          path="/"
+          element={authenticated ? <Navigate to="/chat" replace /> : <Onboarding />}
+        />
+        <Route path="/chat" element={<Protected><Chat /></Protected>} />
+        <Route path="/memories" element={<Protected><Memories /></Protected>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
