@@ -384,7 +384,7 @@ export default function Chat() {
               isSaving={chat.isSaving}
               canSave={chat.messages.length >= 2 && !chat.lastSaveHash}
             />
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center justify-between mt-2 px-4">
               <div
                 className="text-[11px] flex items-center gap-1 cursor-help group relative"
                 style={{ color: '#c8b4a0' }}

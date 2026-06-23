@@ -48,7 +48,7 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
           <div className="relative group">
             {/* Bubble */}
             <div
-              className="rounded-2xl px-4 py-2.5 leading-relaxed text-sm"
+              className="rounded-2xl px-5 py-3 leading-relaxed text-sm"
               style={isUser
                 ? {
                     background: '#6366f1',
