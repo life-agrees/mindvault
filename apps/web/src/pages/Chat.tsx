@@ -6,6 +6,7 @@ import { useChat } from '../hooks/useChat';
 import { MessageBubble } from '../components/chat/MessageBubble';
 import { TypingIndicator } from '../components/chat/TypingIndicator';
 import { ChatInput } from '../components/chat/ChatInput';
+import { MemoryStatusBar } from '../components/chat/MemoryStatusBar';
 import { PersonalityPanel } from '../components/memory/PersonalityPanel';
 
 export default function Chat() {
@@ -320,22 +321,36 @@ export default function Chat() {
                 </div>
                 <div className="text-center max-w-sm px-4">
                   <p className="font-bold text-xl leading-tight" style={{ color: '#1c1914' }}>
-                    {mvUser ? `Welcome back, ${displayName}` : 'Hello there'}
+                    {chat.memoryLoaded ? `Welcome back, ${displayName} 👋` : mvUser ? `Hello, ${displayName}` : 'Hello there'}
                   </p>
-                  <p className="text-sm mt-3 leading-relaxed" style={{ color: '#a8927f' }}>
-                    Tell me anything. Every conversation is encrypted and stored permanently
-                    on a network nobody controls.
-                  </p>
+                  {chat.memoryLoaded ? (
+                    <p className="text-sm mt-3 leading-relaxed" style={{ color: '#a8927f' }}>
+                      I remember you — <strong style={{ color: '#6b5a49' }}>{chat.sessionCount} past session{chat.sessionCount !== 1 ? 's' : ''}</strong> loaded from your encrypted vault on 0G. Pick up where we left off.
+                    </p>
+                  ) : (
+                    <p className="text-sm mt-3 leading-relaxed" style={{ color: '#a8927f' }}>
+                      Tell me anything. Every conversation is encrypted and stored permanently
+                      on a network nobody controls.
+                    </p>
+                  )}
                 </div>
 
-                {/* Starter prompt chips */}
+                {/* Starter prompt chips — context-aware when memory is loaded */}
                 <div className="flex flex-wrap justify-center gap-2 max-w-sm px-4">
-                  {[
-                    "What should I focus on this week?",
-                    "Help me think through a decision",
-                    "What have we talked about before?",
-                    "I need to vent about something",
-                  ].map((prompt) => (
+                  {(chat.memoryLoaded
+                    ? [
+                        'What did we last talk about?',
+                        'Continue where we left off',
+                        'What do you remember about me?',
+                        'Help me plan something new',
+                      ]
+                    : [
+                        'What should I focus on this week?',
+                        'Help me think through a decision',
+                        'What have we talked about before?',
+                        'I need to vent about something',
+                      ]
+                  ).map((prompt) => (
                     <button
                       key={prompt}
                       onClick={() => chat.sendMessage(prompt)}
@@ -385,11 +400,43 @@ export default function Chat() {
         <div className="w-full flex-shrink-0 px-4 sm:px-6 pb-5 pt-3 safe-bottom"
              style={{ background: 'rgba(245,240,232,0.95)', borderTop: '1px solid rgba(120,95,68,0.10)' }}>
           <div className="max-w-2xl mx-auto">
-            <ChatInput onSend={chat.sendMessage} disabled={chat.isThinking} />
+            <MemoryStatusBar
+              memoryLoaded={chat.memoryLoaded}
+              sessionCount={chat.sessionCount}
+              isSaving={chat.isSaving}
+              lastSaveHash={chat.lastSaveHash}
+            />
+            <ChatInput
+              onSend={chat.sendMessage}
+              disabled={chat.isThinking}
+              onSave={chat.saveSession}
+              isSaving={chat.isSaving}
+              canSave={chat.messages.length >= 2 && !chat.lastSaveHash}
+            />
             <div className="flex items-center justify-between mt-2">
-              <p className="text-[11px]" style={{ color: '#c8b4a0' }}>
-                🔐 End-to-end encrypted · Stored on 0G
-              </p>
+              <div
+                className="text-[11px] flex items-center gap-1 cursor-help group relative"
+                style={{ color: '#c8b4a0' }}
+              >
+                <span>🔐 End-to-end encrypted · Stored on 0G</span>
+                <span className="hidden sm:inline-block opacity-65 hover:opacity-100 transition-opacity">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+
+                {/* Cryptographic info tooltip */}
+                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:flex flex-col gap-1 p-3 rounded-xl shadow-xl border text-[10px] w-64 leading-normal z-50 transition-all pointer-events-none"
+                     style={{ background: '#fefcf8', borderColor: 'rgba(120,95,68,0.15)', color: '#6b5a49', boxShadow: '0 4px 20px rgba(120,95,68,0.12)' }}>
+                  <p className="font-semibold text-[#1c1914] flex items-center gap-1">
+                    🛡️ Cryptographic Spec
+                  </p>
+                  <p><strong>Algorithm:</strong> AES-256-GCM (Authenticated Encryption)</p>
+                  <p><strong>Key Source:</strong> Derived via SHA-256 from your Privy embedded wallet signature</p>
+                  <p><strong>Zero-Knowledge:</strong> Backend only sees ciphertext. Decryption is 100% client-side.</p>
+                </div>
+              </div>
               <p className="text-[11px] hidden sm:block" style={{ color: '#c8b4a0' }}>
                 Enter to send · Shift+Enter for new line
               </p>
