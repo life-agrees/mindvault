@@ -39,7 +39,7 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
           {!isUser && (
             <div className="w-7 h-7 rounded-full flex items-center justify-center
                             flex-shrink-0 mb-0.5 shadow-sm"
-                 style={{ background: '#6366f1' }}>
+              style={{ background: '#6366f1' }}>
               <span className="text-white text-[10px] font-bold">MV</span>
             </div>
           )}
@@ -51,26 +51,26 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
               className="rounded-2xl px-5 py-3 leading-relaxed text-sm"
               style={isUser
                 ? {
-                    background: '#6366f1',
-                    color: '#ffffff',
-                    borderRadius: '18px 18px 4px 18px',
-                    boxShadow: '0 2px 12px rgba(99,102,241,0.22)',
-                  }
+                  background: '#6366f1',
+                  color: '#ffffff',
+                  borderRadius: '18px 18px 4px 18px',
+                  boxShadow: '0 2px 12px rgba(99,102,241,0.22)',
+                }
                 : isError
                   ? {
-                      background: 'rgba(220, 38, 38, 0.06)',
-                      color: '#b91c1c',
-                      borderRadius: '18px 18px 18px 4px',
-                      border: '1px solid rgba(220, 38, 38, 0.2)',
-                      boxShadow: '0 1px 4px rgba(220, 38, 38, 0.03)',
-                    }
+                    background: 'rgba(220, 38, 38, 0.06)',
+                    color: '#b91c1c',
+                    borderRadius: '18px 18px 18px 4px',
+                    border: '1px solid rgba(220, 38, 38, 0.2)',
+                    boxShadow: '0 1px 4px rgba(220, 38, 38, 0.03)',
+                  }
                   : {
-                      background: '#fefcf8',
-                      color: '#3d3028',
-                      borderRadius: '18px 18px 18px 4px',
-                      border: '1px solid rgba(120,95,68,0.14)',
-                      boxShadow: '0 1px 4px rgba(120,95,68,0.06)',
-                    }
+                    background: '#fefcf8',
+                    color: '#3d3028',
+                    borderRadius: '18px 18px 18px 4px',
+                    border: '1px solid rgba(120,95,68,0.14)',
+                    boxShadow: '0 1px 4px rgba(120,95,68,0.06)',
+                  }
               }
             >
               {isUser || isError ? (
@@ -116,7 +116,7 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
           </span>
           {!isUser && !isError && (
             <span className="text-[10px] px-1.5 py-0.5 rounded"
-                  style={{ color: '#6366f1', background: 'rgba(99,102,241,0.07)' }}>
+              style={{ color: '#6366f1', background: 'rgba(99,102,241,0.07)' }}>
               via 0G
             </span>
           )}

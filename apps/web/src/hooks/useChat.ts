@@ -244,7 +244,7 @@ export function useChat(): ChatState {
     try {
       sessionStorage.setItem('mv_active_session_id', newId);
       sessionStorage.removeItem(STORAGE_KEY);
-    } catch {}
+    } catch { }
   }, []);
 
   const loadSession = useCallback((session: SessionHistoryItem) => {
@@ -256,7 +256,7 @@ export function useChat(): ChatState {
     try {
       sessionStorage.setItem('mv_active_session_id', session.id);
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session.messages));
-    } catch {}
+    } catch { }
   }, []);
 
   return {
