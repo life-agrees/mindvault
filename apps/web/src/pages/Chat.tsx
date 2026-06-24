@@ -9,6 +9,8 @@ import { ChatInput } from '../components/chat/ChatInput';
 import { MemoryStatusBar } from '../components/chat/MemoryStatusBar';
 import { PersonalityPanel } from '../components/memory/PersonalityPanel';
 import { ProofCard } from '../components/ui/ProofCard';
+import logoImg from '../assets/logo.png';
+import coverImg from '../assets/cover.jpg';
 
 export default function Chat() {
   const { logout: privyLogout } = usePrivy();
@@ -96,10 +98,7 @@ export default function Chat() {
         {/* Brand (with safe-top for notched devices) */}
         <div className="flex items-center gap-2.5 px-4 py-5 safe-top"
              style={{ borderBottom: '1px solid rgba(120,95,68,0.12)' }}>
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-               style={{ background: '#6366f1', boxShadow: '0 4px 12px rgba(99,102,241,0.25)' }}>
-            <span className="text-white text-sm">🧠</span>
-          </div>
+          <img src={logoImg} className="w-8 h-8 rounded-[9px] shadow-sm flex-shrink-0" alt="MindVault Logo" />
           <div>
             <p className="font-bold text-sm leading-none" style={{ color: '#1c1914' }}>MindVault</p>
             <p className="text-[10px] mt-0.5" style={{ color: '#a8927f' }}>AI Memory</p>
@@ -293,11 +292,14 @@ export default function Chat() {
             )}
 
             {!isSyncing && chat.messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 gap-6">
-                <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-3xl shadow-sm"
-                     style={{ background: '#ede7dc', border: '1px solid rgba(120,95,68,0.15)' }}>
-                  🧠
+              <div className="flex flex-col items-center justify-center py-12 gap-6">
+                {/* Custom Submission Banner */}
+                <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-md border border-[rgba(120,95,68,0.13)]">
+                  <img src={coverImg} className="w-full h-auto object-cover block" alt="MindVault Submission Banner" />
                 </div>
+
+                <img src={logoImg} className="w-18 h-18 rounded-[20px] shadow-md" alt="MindVault Logo" />
+
                 <div className="text-center max-w-sm px-4">
                   <p className="font-bold text-xl leading-tight" style={{ color: '#1c1914' }}>
                     {chat.memoryLoaded ? `Welcome back, ${displayName} 👋` : mvUser ? `Hello, ${displayName}` : 'Hello there'}

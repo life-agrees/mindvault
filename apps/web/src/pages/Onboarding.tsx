@@ -2,6 +2,8 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PoweredByBadge } from '../components/ui/PoweredByBadge';
+import logoImg from '../assets/logo.png';
+import coverImg from '../assets/cover.jpg';
 
 export default function Onboarding() {
   const { ready, authenticated, login } = usePrivy();
@@ -55,14 +57,7 @@ export default function Onboarding() {
       <div className="w-full max-w-sm flex flex-col z-10">
         {/* Logo and Brand Header */}
         <div className="flex flex-col items-center mb-9 text-center animate-fade-in-stagger" style={{ animationDelay: '50ms' }}>
-          <div className="w-18 h-18 rounded-[22px] flex items-center justify-center mb-5 shadow-lg animate-float-logo"
-               style={{ 
-                 background: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)', 
-                 boxShadow: '0 10px 28px rgba(99,102,241,0.3)',
-                 border: '1px solid rgba(255,255,255,0.1)'
-               }}>
-            <span className="text-white text-3xl">🧠</span>
-          </div>
+          <img src={logoImg} className="w-20 h-20 rounded-[22px] mb-5 shadow-lg animate-float-logo" alt="MindVault Logo" />
           <h1 className="text-4xl font-bold tracking-tight" 
               style={{ 
                 color: '#1c1914', 
@@ -74,6 +69,12 @@ export default function Onboarding() {
           <p className="text-sm mt-3 text-center max-w-[280px] leading-relaxed" style={{ color: '#6b5a49' }}>
             The AI companion that remembers you forever — and <strong style={{ color: '#1c1914', fontWeight: 600 }}>you own</strong> every memory.
           </p>
+        </div>
+
+        {/* Cover Image Banner */}
+        <div className="w-full rounded-2xl overflow-hidden shadow-md border border-[rgba(120,95,68,0.13)] mb-6 animate-fade-in-stagger"
+             style={{ animationDelay: '100ms' }}>
+          <img src={coverImg} className="w-full h-auto object-cover block" alt="MindVault Banner" />
         </div>
 
         {/* Tactile Feature cards */}
