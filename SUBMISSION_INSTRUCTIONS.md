@@ -1,7 +1,7 @@
 # Submission Instructions & Verification 🧠
 
-**Submission Snapshot:** `a5f14cd437e117517297cd9382fce675c6932652`
-**Latest Tag:** `submission-2026-06-23-a5f14cd`
+**Submission Snapshot:** `637e45e0d27f44db4a59eb2f88e9bff14c0479f7`
+**Latest Tag:** `submission-2026-06-24-637e45e`
 **Walkthrough Video:** [Watch the YouTube Short Walkthrough](https://youtube.com/shorts/L20Mj668dc0?si=bhGKYH-HyhniXraU)
 
 ---

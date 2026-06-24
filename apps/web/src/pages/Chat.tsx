@@ -10,7 +10,6 @@ import { MemoryStatusBar } from '../components/chat/MemoryStatusBar';
 import { PersonalityPanel } from '../components/memory/PersonalityPanel';
 import { ProofCard } from '../components/ui/ProofCard';
 import logoImg from '../assets/logo.png';
-import coverImg from '../assets/cover.jpg';
 
 export default function Chat() {
   const { logout: privyLogout } = usePrivy();
@@ -293,12 +292,12 @@ export default function Chat() {
 
             {!isSyncing && chat.messages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 gap-6">
-                {/* Custom Submission Banner */}
-                <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-md border border-[rgba(120,95,68,0.13)]">
-                  <img src={coverImg} className="w-full h-auto object-cover block" alt="MindVault Submission Banner" />
-                </div>
-
-                <img src={logoImg} className="w-18 h-18 rounded-[20px] shadow-md" alt="MindVault Logo" />
+                <img
+                  src={logoImg}
+                  className="w-24 h-24 rounded-[26px]"
+                  style={{ boxShadow: '0 8px 32px rgba(99,102,241,0.18), 0 2px 8px rgba(120,95,68,0.14)' }}
+                  alt="MindVault Logo"
+                />
 
                 <div className="text-center max-w-sm px-4">
                   <p className="font-bold text-xl leading-tight" style={{ color: '#1c1914' }}>
