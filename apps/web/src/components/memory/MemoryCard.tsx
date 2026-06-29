@@ -53,7 +53,7 @@ export function MemoryCard({ memory, onClick }: Props) {
       </div>
 
       {/* Summary preview */}
-      <p className="text-sm font-medium leading-relaxed mb-3" style={{ color: '#1c1914' }}>
+      <p className="text-sm font-medium leading-snug flex-1 line-clamp-2 mb-3" style={{ color: '#1c1914' }}>
         {summaryText}
       </p>
 

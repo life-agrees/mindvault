@@ -135,7 +135,7 @@ export async function summarizeSession(messages: Message[]): Promise<string> {
       .map((m) => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
       .join('\n');
 
-    const summary = await computeChat(
+    const result = await computeChat(
       [
         {
           role: 'user',
@@ -145,7 +145,7 @@ export async function summarizeSession(messages: Message[]): Promise<string> {
       'You summarize conversations concisely. Return only the summary, nothing else.'
     );
 
-    return summary.slice(0, 200);
+    return result.text.slice(0, 200);
   } catch {
     return generateTitle(messages);
   }

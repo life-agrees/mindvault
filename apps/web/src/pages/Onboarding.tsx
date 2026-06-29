@@ -66,26 +66,26 @@ export default function Onboarding() {
               }}>
             MindVault
           </h1>
-          <p className="text-sm mt-3 text-center max-w-[280px] leading-relaxed" style={{ color: '#6b5a49' }}>
-            The AI companion that remembers you forever — and <strong style={{ color: '#1c1914', fontWeight: 600 }}>you own</strong> every memory.
+          <p className="text-sm mt-2 text-center max-w-[280px] leading-relaxed px-4" style={{ color: '#6b5a49' }}>
+            The AI companion that remembers you forever — and you own every memory.
           </p>
         </div>
 
         {/* Cover Image Banner */}
-        <div className="w-full rounded-2xl overflow-hidden shadow-md border border-[rgba(120,95,68,0.13)] mb-6 animate-fade-in-stagger"
+        <div className="w-full rounded-2xl overflow-hidden shadow-md border border-[rgba(120,95,68,0.13)] mb-5 animate-fade-in-stagger"
              style={{ animationDelay: '100ms' }}>
           <img src={coverImg} className="w-full h-auto object-cover block" alt="MindVault Banner" />
         </div>
 
         {/* Tactile Feature cards */}
-        <div className="flex flex-col gap-3 mb-9">
+        <div className="flex flex-col gap-2.5 mb-8">
           {[
-            { icon: '🧠', title: 'Permanent Memory', desc: 'Remembers every conversation context' },
-            { icon: '🔐', title: 'Cryptographic Privacy', desc: 'AES-256-GCM encrypted via your wallet signature' },
-            { icon: '⛓️', title: 'Decentralized Sovereignty', desc: 'Stored permanently on the 0G network' },
+            { icon: '🧠', title: 'Permanent Memory', desc: 'Remembers every conversation, forever' },
+            { icon: '🔐', title: 'You Own It', desc: 'AES-256-GCM encrypted on 0G Storage' },
+            { icon: '⛓️', title: 'Decentralized', desc: 'No company can delete or sell your data' },
           ].map((item, index) => (
             <div key={item.title}
-              className="flex items-center gap-4 rounded-2xl px-4.5 py-4 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(120,95,68,0.06)] cursor-default group animate-fade-in-stagger"
+              className="flex items-center gap-3.5 rounded-2xl px-4 py-3.5 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(120,95,68,0.06)] cursor-default group animate-fade-in-stagger"
               style={{ 
                 background: '#fefcf8', 
                 border: '1px solid rgba(120,95,68,0.13)',

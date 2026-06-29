@@ -69,13 +69,15 @@ router.post(
 
       const messages: Message[] = [...sessionMessages, { role: 'user', content: message }];
 
-      const response = await computeChat(messages, systemWithMemory);
+      const result = await computeChat(messages, systemWithMemory);
 
       res.json({
-        response,
+        response: result.text,
         messageCount: messages.length + 1,
         memoryLoaded: memories.length > 0,
         sessionCount: memories.length,
+        provider: result.provider,
+        fallback: result.fallback,
       });
     } catch (err: any) {
       console.error('Chat error:', err);

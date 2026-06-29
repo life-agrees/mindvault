@@ -57,7 +57,7 @@ export function ChatInput({ onSend, disabled, onSave, isSaving, canSave }: Props
   return (
     <div>
       <div
-        className="flex items-end gap-2 rounded-2xl px-4 py-2.5 transition-all duration-200"
+        className="flex items-end gap-2 rounded-2xl px-4 py-3 transition-all duration-200"
         style={{
           background: '#fefcf8',
           border: `1px solid ${getBorderStyle()}`,

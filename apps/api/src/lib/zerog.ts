@@ -44,10 +44,18 @@ async function getStorageSdk(): Promise<any> {
   throw new Error('No 0G storage SDK installed. Install @0gfoundation/0g-storage-ts-sdk or @0glabs/0g-ts-sdk');
 }
 
-// Represent a message object in the 0G Compute chat payload
 export type Message = { role: 'user' | 'assistant' | 'system'; content: string };
 
-export async function computeChat(messages: Message[], systemPrompt: string): Promise<string> {
+export type ComputeResponse = {
+  text: string;
+  provider: '0g' | 'groq' | 'echo';
+  fallback: boolean;
+};
+
+export async function computeChat(
+  messages: Message[],
+  systemPrompt: string
+): Promise<ComputeResponse> {
   try {
     // Strip trailing slashes then strip any trailing /chat/completions
     // so that COMPUTE_ENDPOINT can be set to either:
@@ -82,44 +90,52 @@ export async function computeChat(messages: Message[], systemPrompt: string): Pr
     if (!text) throw new Error('Empty response from 0G Compute');
 
     console.log('✅ Response from 0G Compute');
-    return text;
+    return { text, provider: '0g', fallback: false };
   } catch (err: any) {
     console.warn('0G Compute unavailable, using fallback:', err?.message);
     return await fallbackChat(messages, systemPrompt);
   }
 }
 
-async function fallbackChat(messages: Message[], systemPrompt: string): Promise<string> {
+async function fallbackChat(
+  messages: Message[],
+  systemPrompt: string
+): Promise<ComputeResponse> {
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
   const GROQ_API_URL = process.env.GROQ_API_URL || 'https://api.groq.com/openai/v1';
 
-  const localEchoFallback = async () => {
+  if (!GROQ_API_KEY) {
     const last = messages[messages.length - 1]?.content ?? '';
-    return `Echo: ${last}`;
-  };
-
-  if (!GROQ_API_KEY) return await localEchoFallback();
+    return { text: `Echo: ${last}`, provider: 'echo', fallback: true };
+  }
 
   try {
-    const payload = {
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      max_tokens: 1000,
-      temperature: 0.7,
-    };
-
-    const res = await axios.post(`${GROQ_API_URL}/chat/completions`, payload, {
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${GROQ_API_KEY}` },
-      timeout: 30000,
-    });
+    const res = await axios.post(
+      `${GROQ_API_URL}/chat/completions`,
+      {
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+        max_tokens: 1000,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+        },
+        timeout: 30000,
+      }
+    );
 
     const text = res.data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error('Empty Groq response');
 
-    if (!text) return await localEchoFallback();
-    return text;
+    console.log('✅ Response from Groq fallback');
+    return { text, provider: 'groq', fallback: true };
   } catch (err: any) {
-    console.warn('GROQ fallback failed, using local echo:', err?.message);
-    return await localEchoFallback();
+    console.warn('Groq fallback failed:', err?.message);
+    const last = messages[messages.length - 1]?.content ?? '';
+    return { text: `Echo: ${last}`, provider: 'echo', fallback: true };
   }
 }
 

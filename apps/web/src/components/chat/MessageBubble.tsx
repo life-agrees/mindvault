@@ -115,10 +115,23 @@ export function MessageBubble({ message, isError, onRetry }: Props) {
             {message.timestamp ? formatTime(message.timestamp) : ''}
           </span>
           {!isUser && !isError && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded"
-              style={{ color: '#6366f1', background: 'rgba(99,102,241,0.07)' }}>
-              via 0G
-            </span>
+            <>
+              {message.fallback ? (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-[10px] font-medium" style={{ color: '#d97706' }}>
+                    Backup network (0G offline/busy)
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(99,102,241,0.5)' }} />
+                  <span className="text-[10px]" style={{ color: '#a8927f' }}>
+                    via 0G Compute
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
 

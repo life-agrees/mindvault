@@ -7,6 +7,8 @@ export type ChatMessage = {
   id: string;
   timestamp: number;   // unix ms
   isError?: boolean;
+  provider?: '0g' | 'groq' | 'echo';
+  fallback?: boolean;
 };
 
 export type SessionHistoryItem = {
@@ -155,6 +157,8 @@ export function useChat(): ChatState {
         content: data.response,
         id: genId(),
         timestamp: Date.now(),
+        provider: data.provider,
+        fallback: data.fallback,
       };
 
       setMessages((prev) => [...prev, aiMsg]);

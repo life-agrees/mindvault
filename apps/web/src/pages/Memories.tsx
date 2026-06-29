@@ -52,21 +52,26 @@ export default function Memories() {
           )}
 
           {!isLoading && memories.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl"
-                   style={{ background: '#ede7dc', border: '1px solid rgba(120,95,68,0.13)' }}>
+            <div className="flex flex-col items-center justify-center py-20 gap-5">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl"
+                   style={{ background: '#ede7dc', border: '1px solid rgba(120,95,68,0.15)' }}>
                 🧠
               </div>
-              <div className="text-center">
-                <p className="font-semibold" style={{ color: '#1c1914' }}>No memories yet</p>
-                <p className="text-sm mt-1.5 max-w-[260px] leading-relaxed" style={{ color: '#a8927f' }}>
-                  Start a conversation. After a couple exchanges, it's stored on 0G permanently.
+              <div className="text-center px-6">
+                <p className="font-semibold text-base" style={{ color: '#1c1914' }}>
+                  No memories yet
+                </p>
+                <p className="text-sm mt-2 leading-relaxed max-w-[240px]" style={{ color: '#a8927f' }}>
+                  Start a conversation. After a few exchanges MindVault saves
+                  your memory permanently to 0G Storage.
                 </p>
               </div>
-              <button onClick={() => navigate('/chat')}
-                className="mt-2 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
-                style={{ background: '#6366f1' }}>
-                Start chatting
+              <button
+                onClick={() => navigate('/chat')}
+                className="hover:opacity-90 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-opacity active:scale-95"
+                style={{ background: '#6366f1', boxShadow: '0 2px 12px rgba(99,102,241,0.2)' }}
+              >
+                Start a conversation →
               </button>
             </div>
           )}

@@ -385,6 +385,7 @@ export default function Chat() {
               sessionCount={chat.sessionCount}
               isSaving={chat.isSaving}
               lastSaveHash={chat.lastSaveHash}
+              lastSaveTx={chat.lastSaveTx}
             />
             <ChatInput
               onSend={chat.sendMessage}
